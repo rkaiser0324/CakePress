@@ -65,6 +65,19 @@ if (!defined('APP_DIR')) {
  */
 //define('CAKE_CORE_INCLUDE_PATH', ROOT . DS . 'lib');
 
+// Modified from Cake/bootstrap.php so we can pre-define FULL_BASE_URL here instead.
+if (defined('JAKE')) {
+    $s = null;
+    if (isset($_SERVER['HTTPS'])) {
+        $s = 's';
+    }
+    $httpHost = $_SERVER['HTTP_HOST'];
+    if (isset($httpHost)) {
+        define('FULL_BASE_URL', 'http' . $s . '://' . $httpHost . '/app');
+    }
+    unset($httpHost, $s);
+}
+
 /**
  * Editing below this line should NOT be necessary.
  * Change at your own risk.
@@ -102,9 +115,47 @@ if (!empty($failed)) {
 }
 
 App::uses('Dispatcher', 'Routing');
-
+//
+//$Dispatcher = new Dispatcher();
+//$Dispatcher->dispatch(
+//	new CakeRequest(),
+//	new CakeResponse()
+//);
 $Dispatcher = new Dispatcher();
-$Dispatcher->dispatch(
-	new CakeRequest(),
-	new CakeResponse()
-);
+$r = new CakeRequest();
+if (defined('JAKE'))
+{
+
+    $r->url = $url;
+    $r->here = $url;
+    unset($url);
+
+    class JakeResponse extends CakeResponse
+    {
+    /**
+     * Sends the response to the client, without some headers - e.g., the Content-Length header shouldn't be set 
+     * explicitly because Joomla doesn't set it, and anything Cake would set, would be wrong in this case.
+     *
+     * @return void
+     */
+            public function send() {
+                    if (isset($this->_headers['Location']) && $this->_status === 200) {
+                            $this->statusCode(302);
+                    }
+                    $codeMessage = $this->_statusCodes[$this->_status];
+                    $this->_setCookies();
+                    foreach ($this->_headers as $header => $value) {
+                            $this->_sendHeader($header, $value);
+                    }
+                    if ($this->_file) {
+                            $this->_sendFile($this->_file);
+                            $this->_file = null;
+                    } else {
+                            $this->_sendContent($this->_body);
+                    }
+            }
+    }
+    $Dispatcher->dispatch($r, new JakeResponse(array('charset' => Configure::read('App.encoding'))));
+}
+else
+    $Dispatcher->dispatch($r, new CakeResponse(array('charset' => Configure::read('App.encoding'))));
