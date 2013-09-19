@@ -1,7 +1,7 @@
 CakePress
 =========
 
-CakePress is a Wordpress 3.6 plugin to integrate a CakePHP 2.3.8 web application into Wordpress.  It is based on the Jake project at https://github.com/rkaiser0324/jake, which does the same for Joomla.
+CakePress is a Wordpress 3.6 plugin to integrate a CakePHP 2.3.8 web application into Wordpress.  It is based on the [Jake project](https://github.com/rkaiser0324/jake), which does the same for Joomla.
 
 ## Configuration
 
@@ -36,4 +36,4 @@ else
 
 ## Credits
 
-This project was originally developed in 2007 by [Mariano Iglesias](https://github.com/mariano) and [Max](http://www.gigapromoters.com/blog/). Further credits go to Dr. Tarique Sani for his insightful ideas.  It is now maintained by [Rolf Kaiser](http://blog.echothis.com).
+This project was based upon the [Jake project](https://github.com/rkaiser0324/jake) which itself was originally developed in 2007 by [Mariano Iglesias](https://github.com/mariano) and [Max](http://www.gigapromoters.com/blog/). Further credits go to Dr. Tarique Sani for his insightful ideas.  Jake is now maintained by [Rolf Kaiser](http://blog.echothis.com).
