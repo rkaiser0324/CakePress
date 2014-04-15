@@ -115,12 +115,6 @@ if (!empty($failed)) {
 }
 
 App::uses('Dispatcher', 'Routing');
-//
-//$Dispatcher = new Dispatcher();
-//$Dispatcher->dispatch(
-//	new CakeRequest(),
-//	new CakeResponse()
-//);
 $Dispatcher = new Dispatcher();
 $r = new CakeRequest();
 if (defined('JAKE'))

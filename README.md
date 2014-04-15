@@ -3,6 +3,13 @@ CakePress
 
 CakePress is a Wordpress 3.6 plugin to integrate a CakePHP 2.3.8 web application into Wordpress.  It is based on the [Jake project](https://github.com/rkaiser0324/jake), which does the same for Joomla.
 
+This project contains both CakePHP and WordPress codebases, as a demonstration.  But all the magic specific to this plugin is contained in the following files:
+* WordPress/wp-content/themes/twentytwelve/index.php
+* WordPress/.htaccess
+* WordPress/wp-content/plugins/CakePress/*
+* cakephp/app (a single-model CakePHP application, as a demo)
+* cakephp/app/webroot/index.php
+
 ## Configuration
 
 - The repo contains both WordPress and CakePHP codebases in the proper locations.  The CakePHP directory should be named "cakephp" and be a sibling to the WordPress one, i.e., your WORDPRESS_ROOT is `/path/to/www/WordPress` and your CAKEPHP_ROOT is `/path/to/www/cakephp`.

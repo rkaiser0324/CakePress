@@ -22,6 +22,14 @@ class CakePressPlugin {
     }
 
     function render() {
+
+        // Handle redirects as per http://www.dev4press.com/2012/tutorials/wordpress/practical/canonical-redirect-problem-and-solutions/
+        remove_filter('template_redirect', 'redirect_canonical');
+        add_filter('redirect_canonical', function ($redirect_url, $requested_url) {
+            return strstr($requested_url, '/app/') != null ? $requested_url : $redirect_url;
+        }, -1, 2);
+        add_filter('template_redirect', 'redirect_canonical');
+
         $url = null;
         if (preg_match('/^\/app/', $_SERVER['REQUEST_URI']))
             $url = str_replace('/app', '', $_SERVER['REQUEST_URI']);
@@ -36,7 +44,7 @@ class CakePressPlugin {
 
             // Set the SEF URL to match the rewrite rule in /.htaccess
             $cakeDispatcher->setSefCakeApplicationBase('/app');
-            $cakeDispatcher->setComponent('http://localhost:98//index.php?option=com_jake&jrun=$CAKE_ACTION');
+            $cakeDispatcher->setComponent('/index.php?option=com_jake&jrun=$CAKE_ACTION');
             $cakeDispatcher->setCleanOutput(false);
             $cakeDispatcher->setCleanOutputParameter('task', 'clean');
             $cakeDispatcher->setIgnoreParameters(array('option', 'jrun', 'task', 'url'));

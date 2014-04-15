@@ -484,15 +484,3 @@ function twentytwelve_customize_preview_js() {
 	wp_enqueue_script( 'twentytwelve-customizer', get_template_directory_uri() . '/js/theme-customizer.js', array( 'customize-preview' ), '20130301', true );
 }
 add_action( 'customize_preview_init', 'twentytwelve_customize_preview_js' );
-
-/*
- * Handle redirects as per http://www.dev4press.com/2012/tutorials/wordpress/practical/canonical-redirect-problem-and-solutions/
- */
-remove_filter('template_redirect', 'redirect_canonical');
-add_filter('redirect_canonical', 'my_redirect_canonical', -1, 2);
-
-function my_redirect_canonical($redirect_url, $requested_url) {
-    return strstr($requested_url, '/app/') != null ? $requested_url : $redirect_url;
-}
-
-add_filter('template_redirect', 'redirect_canonical');
