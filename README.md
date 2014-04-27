@@ -31,14 +31,19 @@ Alias /webapp "CAKEPHP_ROOT/app/webroot"
 
 After configuration, your CakePHP app is available as-is at `http://wordpressserver/app/`, so you can do stuff like this in your CakePHP app:
 ```php
-// Check for the constant "JAKE" (named that for historical reasons)
-if (defined('JAKE'))  
-{
-    // do something involving WordPress
-    echo 'Running inside CakePress';
-}
-else
-    echo "Standalone CakePHP app, not inside CakePress";
+
+    function beforeFilter() {
+        // Check for the constant "JAKE" (named that for historical reasons)
+        if (defined('JAKE'))  
+        {
+            // Running inside CakePress
+            $this->set('user', wp_get_current_user());
+        }
+        else
+        {
+            // Standalone CakePHP app, not inside CakePress
+        }             
+    }
 ```
 
 ## Credits
