@@ -19,12 +19,6 @@ get_header(); ?>
 	<div id="primary" class="site-content">
 		<div id="content" role="main">
 
-		    
-			<?php 
-$cake_output = $cakepress_plugin->getOutput();			    
-if (strlen($cake_output) > 0)
-    echo $cake_output;
-else { // No Cake ?>
 		<?php if ( have_posts() ) : ?>
 
 			<?php /* Start the Loop */ ?>
@@ -65,7 +59,7 @@ else { // No Cake ?>
 			</article><!-- #post-0 -->
 
 		<?php endif; // end have_posts() check ?>
-			<?php } // End no Cake ?>
+
 		</div><!-- #content -->
 	</div><!-- #primary -->
 

@@ -1,4 +1,5 @@
-# BEGIN WordPress
+# BEGIN CakePress
+
 RewriteEngine On
 # For Jake, we need to handle everything that starts with "app"
 # See http://www.phpbb-seo.com/en/apache-mod-rewrite/article3226.html and http://blog.echothis.com/2009/07/22/search-engine-friendly-urls-using-the-jake-bridge/
@@ -17,4 +18,9 @@ RewriteRule     ^app\/(.*)$     /webapp/$1                                      
 
 # And finally, handle everything remaining as an ordinary Cake action
 RewriteRule	^app(.*)$	/index.php?option=com_jake&jrun=$1		[QSA,L]
+
+# END CakePress
+
+# BEGIN WordPress
+
 # END WordPress
