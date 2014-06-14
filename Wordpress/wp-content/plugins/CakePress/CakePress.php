@@ -48,9 +48,9 @@ class CakePressPlugin {
         $cakeDispatcher->setIgnoreParameters(array('option', 'jrun', 'task', 'url'));
         $cakeDispatcher->setRestoreSession(true);
 
-        //logfile('before get');
+        logfile('before get');
         $arr = $cakeDispatcher->get($this->_url);
-        //logfile('after get');
+        logfile('after get');
 
         if (!empty($arr['head']['stylesheets'])) {
             for ($i = 0; $i < count($arr['head']['stylesheets']); $i++) {
@@ -65,9 +65,45 @@ class CakePressPlugin {
         $this->_output = $arr['body'];
         $this->_title = $arr['head']['title'];
 
-        add_filter('the_content', array($this, 'replace_page_content'));
-        add_filter('the_title', array($this, 'replace_page_title'), 100);
-        add_filter('wp_title', array($this, 'replace_page_head_title'), 100, 3);
+        add_filter('404_template', array( $this, 'maybe_use_custom_404_template' ) );
+        add_filter('the_content', array($this, 'replacePageContent'));
+        add_filter('the_title', array($this, 'replacePageTitle'), 100);
+        add_filter('wp_title', array($this, 'replacePageHeadTitle'), 100, 3);
+    }
+    
+    // Inspired by https://wordpress.org/plugins/custom-404-error-page/
+    function maybe_use_custom_404_template( $template ) {
+//         $templates = wp_get_theme()->get_page_templates();
+//    foreach ( $templates as $template_name => $template_filename ) {
+//        echo "$template_name ($template_filename)<br />";
+//    }
+        global $wp_query, $post;
+
+                     
+        			// Get our custom 404 post object. We need to assign
+			// $post global in order to force get_post() to work
+			// during page template resolving.
+			$post = get_post(11);
+                        $post->post_content = $this->_output;
+                        //var_dump($post);
+
+			// Populate the posts array with our 404 page object
+			$wp_query->posts = array( $post );
+
+			// Set the query object to enable support for custom page templates
+			$wp_query->queried_object_id = 11;
+			$wp_query->queried_object = $post;
+			
+			// Set post counters to avoid loop errors
+			$wp_query->post_count = 1;
+			$wp_query->found_posts = 1;
+			$wp_query->max_num_pages = 0;
+                        
+                        return get_page_template();
+                        
+//        return (get_template_directory() . DIRECTORY_SEPARATOR . 'index.php');
+//        die(theme_directory());
+//        die($template);
     }
 
     // Simple helper function to aid in debugging
@@ -83,7 +119,7 @@ class CakePressPlugin {
      * @param string $content
      * @return string
      */
-    function replace_page_content($content) {
+    function replacePageContent($content) {
         if (is_singular() && is_main_query()) {
             $content = $this->_output;
         }
@@ -98,7 +134,7 @@ class CakePressPlugin {
      * @param string $sep_location
      * @return string
      */
-    function replace_page_head_title($title, $sep, $sep_location) {
+    function replacePageHeadTitle($title, $sep, $sep_location) {
         return $this->_title;
     }
 
@@ -111,11 +147,21 @@ class CakePressPlugin {
      * @param string $content
      * @return string
      */
-    function replace_page_title($content) {
+    function replacePageTitle($content) {
         return in_the_loop() ? $this->_title : $content;
     }
 
 }
 $cakepress_plugin = new CakePressPlugin();
+//
+//add_filter('template_redirect', 'my_404_override' );
+//function my_404_override() {
+//    global $wp_query;
+//
+//    if (true) {
+//        //status_header( 200 );
+//        $wp_query->is_404=false;
+//    }
+//}
 
 

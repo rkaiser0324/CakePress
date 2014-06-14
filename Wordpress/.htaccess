@@ -1,7 +1,11 @@
+# BEGIN WordPress
+<IfModule mod_rewrite.c>
+RewriteEngine On
+RewriteBase /
+
 # BEGIN CakePress
 
-RewriteEngine On
-# For Jake, we need to handle everything that starts with "app"
+# We need to handle everything that starts with "app"
 # See http://www.phpbb-seo.com/en/apache-mod-rewrite/article3226.html and http://blog.echothis.com/2009/07/22/search-engine-friendly-urls-using-the-jake-bridge/
 
 # First, redirect any static assets to /webapp/* as per http://www.askapache.com/htaccess/setenvif.html
@@ -19,8 +23,11 @@ RewriteRule     ^app\/(.*)$     /webapp/$1                                      
 # And finally, handle everything remaining as an ordinary Cake action
 RewriteRule	^app(.*)$	/index.php?option=com_jake&jrun=$1		[QSA,L]
 
-# END CakePress
+# End CakePress
 
-# BEGIN WordPress
-
+RewriteRule ^index\.php$ - [L]
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule . /index.php [L]
+</IfModule>
 # END WordPress
