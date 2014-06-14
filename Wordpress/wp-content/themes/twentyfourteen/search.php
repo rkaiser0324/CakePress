@@ -1,41 +1,49 @@
 <?php
 /**
- * The template for displaying Search Results pages.
+ * The template for displaying Search Results pages
  *
  * @package WordPress
  * @subpackage Twenty_Fourteen
+ * @since Twenty Fourteen 1.0
  */
 
 get_header(); ?>
 
-<section id="primary" class="content-area">
-	<div id="content" class="site-content" role="main">
+	<section id="primary" class="content-area">
+		<div id="content" class="site-content" role="main">
 
-	<?php if ( have_posts() ) : ?>
+			<?php if ( have_posts() ) : ?>
 
-		<header class="page-header">
-			<h1 class="page-title"><?php printf( __( 'Search Results for: %s', 'twentyfourteen' ), '<span>' . get_search_query() . '</span>' ); ?></h1>
-		</header><!-- .page-header -->
+			<header class="page-header">
+				<h1 class="page-title"><?php printf( __( 'Search Results for: %s', 'twentyfourteen' ), get_search_query() ); ?></h1>
+			</header><!-- .page-header -->
 
-		<?php while ( have_posts() ) : the_post(); ?>
+				<?php
+					// Start the Loop.
+					while ( have_posts() ) : the_post();
 
-			<?php twentyfourteen_get_template_part(); ?>
+						/*
+						 * Include the post format-specific template for the content. If you want to
+						 * use this in a child theme, then include a file called called content-___.php
+						 * (where ___ is the post format) and that will be used instead.
+						 */
+						get_template_part( 'content', get_post_format() );
 
-		<?php endwhile; ?>
+					endwhile;
+					// Previous/next post navigation.
+					twentyfourteen_paging_nav();
 
-		<?php twentyfourteen_content_nav( 'nav-below' ); ?>
+				else :
+					// If no content, include the "No posts found" template.
+					get_template_part( 'content', 'none' );
 
-	<?php else : ?>
+				endif;
+			?>
 
-		<?php get_template_part( 'no-results', 'search' ); ?>
+		</div><!-- #content -->
+	</section><!-- #primary -->
 
-	<?php endif; ?>
-
-	</div><!-- #content .site-content -->
-</section><!-- #primary .content-area -->
-
-<?php get_sidebar( 'content' ); ?>
-
-<?php get_sidebar(); ?>
-
-<?php get_footer(); ?>
+<?php
+get_sidebar( 'content' );
+get_sidebar();
+get_footer();

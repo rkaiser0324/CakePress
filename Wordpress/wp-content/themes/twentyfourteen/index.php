@@ -1,84 +1,61 @@
 <?php
 /**
- * The main template file.
+ * The main template file
  *
- * This is the most generic template file in a WordPress theme
- * and one of the two required files for a theme (the other being style.css).
- * It is used to display a page when nothing more specific matches a query.
- * E.g., it puts together the home page when no home.php file exists.
- * Learn more: http://codex.wordpress.org/Template_Hierarchy
+ * This is the most generic template file in a WordPress theme and one
+ * of the two required files for a theme (the other being style.css).
+ * It is used to display a page when nothing more specific matches a query,
+ * e.g., it puts together the home page when no home.php file exists.
+ *
+ * @link http://codex.wordpress.org/Template_Hierarchy
  *
  * @package WordPress
  * @subpackage Twenty_Fourteen
+ * @since Twenty Fourteen 1.0
  */
 
 get_header(); ?>
 
-<?php if ( is_front_page() ) : ?>
+<div id="main-content" class="main-content">
 
-	<div class="front-page-content-wrapper">
-		<div class="front-page-content-main">
-
-			<?php if ( twentyfourteen_has_featured_posts() ) : ?>
-				<?php get_template_part( 'featured-content' ); ?>
-			<?php endif; ?>
-
-			<div class="front-page-content-area clearfix">
-
-				<div id="primary" class="content-area no-sidebar">
-					<div id="content" class="site-content" role="main">
-					<?php
-						if ( have_posts() ) :
-							while ( have_posts() ) :
-								the_post();
-								twentyfourteen_get_template_part();
-							endwhile;
-
-							twentyfourteen_content_nav( 'nav-below' );
-						else :
-							get_template_part( 'no-results', 'index' );
-						endif;
-					?>
-					</div><!-- #content .site-content -->
-				</div><!-- #primary .content-area -->
-
-				<?php get_template_part( 'recent-formatted-posts' ); ?>
-
-			</div><!-- .front-page-content-area -->
-
-		</div><!-- .front-page-content-main -->
-	</div><!-- .front-page-content-wrapper -->
-
-	<?php get_sidebar(); ?>
-
-<?php else : ?>
+<?php
+	if ( is_front_page() && twentyfourteen_has_featured_posts() ) {
+		// Include the featured content template.
+		get_template_part( 'featured-content' );
+	}
+?>
 
 	<div id="primary" class="content-area">
 		<div id="content" class="site-content" role="main">
 
-		<?php if ( have_posts() ) : ?>
+		<?php
+			if ( have_posts() ) :
+				// Start the Loop.
+				while ( have_posts() ) : the_post();
 
-			<?php while ( have_posts() ) : the_post(); ?>
+					/*
+					 * Include the post format-specific template for the content. If you want to
+					 * use this in a child theme, then include a file called called content-___.php
+					 * (where ___ is the post format) and that will be used instead.
+					 */
+					get_template_part( 'content', get_post_format() );
 
-				<?php twentyfourteen_get_template_part(); ?>
+				endwhile;
+				// Previous/next post navigation.
+				twentyfourteen_paging_nav();
 
-			<?php endwhile; ?>
+			else :
+				// If no content, include the "No posts found" template.
+				get_template_part( 'content', 'none' );
 
-			<?php twentyfourteen_content_nav( 'nav-below' ); ?>
+			endif;
+		?>
 
-		<?php else : ?>
-
-			<?php get_template_part( 'no-results', 'index' ); ?>
-
-		<?php endif; ?>
-
-		</div><!-- #content .site-content -->
-	</div><!-- #primary .content-area -->
-
+		</div><!-- #content -->
+	</div><!-- #primary -->
 	<?php get_sidebar( 'content' ); ?>
+</div><!-- #main-content -->
 
-	<?php get_sidebar(); ?>
-
-<?php endif; // is_front_page() check ?>
-
-<?php get_footer(); ?>
+<?php
+get_sidebar();
+get_footer();

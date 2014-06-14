@@ -1,76 +1,48 @@
 <?php
 /**
- * The template for displaying all pages.
+ * The template for displaying all pages
  *
  * This is the template that displays all pages by default.
- * Please note that this is the WordPress construct of pages
- * and that other 'pages' on your WordPress site will use a
- * different template.
+ * Please note that this is the WordPress construct of pages and that
+ * other 'pages' on your WordPress site will use a different template.
  *
  * @package WordPress
  * @subpackage Twenty_Fourteen
+ * @since Twenty Fourteen 1.0
  */
 
 get_header(); ?>
 
-<?php if ( is_front_page() ) : ?>
+<div id="main-content" class="main-content">
 
-	<div class="front-page-content-wrapper">
-		<div class="front-page-content-main">
-
-			<?php if ( twentyfourteen_has_featured_posts() ) : ?>
-				<?php get_template_part( 'featured-content' ); ?>
-			<?php endif; ?>
-
-			<div class="front-page-content-area clearfix">
-
-				<div id="primary" class="content-area no-sidebar">
-					<div id="content" class="site-content" role="main">
-					<?php
-						if ( have_posts() ) :
-							while ( have_posts() ) :
-								the_post();
-								get_template_part( 'content', 'page' );
-								comments_template( '', true );
-							endwhile;
-
-							twentyfourteen_content_nav( 'nav-below' );
-						else :
-							get_template_part( 'no-results', 'index' );
-						endif;
-					?>
-					</div><!-- #content .site-content -->
-				</div><!-- #primary .content-area -->
-
-				<?php get_template_part( 'recent-formatted-posts' ); ?>
-
-			</div><!-- .front-page-content-area -->
-
-		</div><!-- .front-page-content-main -->
-	</div><!-- .front-page-content-wrapper -->
-
-	<?php get_sidebar(); ?>
-
-<?php else : ?>
-
+<?php
+	if ( is_front_page() && twentyfourteen_has_featured_posts() ) {
+		// Include the featured content template.
+		get_template_part( 'featured-content' );
+	}
+?>
 	<div id="primary" class="content-area">
 		<div id="content" class="site-content" role="main">
 
-			<?php while ( have_posts() ) : the_post(); ?>
+			<?php
+				// Start the Loop.
+				while ( have_posts() ) : the_post();
 
-				<?php get_template_part( 'content', 'page' ); ?>
+					// Include the page content template.
+					get_template_part( 'content', 'page' );
 
-				<?php comments_template( '', true ); ?>
+					// If comments are open or we have at least one comment, load up the comment template.
+					if ( comments_open() || get_comments_number() ) {
+						comments_template();
+					}
+				endwhile;
+			?>
 
-			<?php endwhile; ?>
-
-		</div><!-- #content .site-content -->
-	</div><!-- #primary .content-area -->
-
+		</div><!-- #content -->
+	</div><!-- #primary -->
 	<?php get_sidebar( 'content' ); ?>
+</div><!-- #main-content -->
 
-	<?php get_sidebar(); ?>
-
-<?php endif; // is_front_page() check ?>
-
-<?php get_footer(); ?>
+<?php
+get_sidebar();
+get_footer();
