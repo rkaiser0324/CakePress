@@ -1,19 +1,21 @@
 CakePress
 =========
 
-CakePress is a Wordpress 3.6 plugin to integrate a CakePHP 2.3.8 web application into Wordpress.  It is based on the [Jake project](https://github.com/rkaiser0324/jake), which does the same for Joomla.
+CakePress is a Wordpress 3.6+ plugin to integrate a CakePHP 2.3.8 web application into Wordpress.  It is based on the [Jake project](https://github.com/rkaiser0324/jake), which does the same for Joomla.
 
 This project contains both CakePHP and WordPress codebases, as a demonstration.  But all the magic specific to this plugin is contained in the following files:
-* WordPress/wp-content/themes/twentytwelve/index.php
-* WordPress/.htaccess
-* WordPress/wp-content/plugins/CakePress/*
-* cakephp/app (a single-model CakePHP application, as a demo)
-* cakephp/app/webroot/index.php
+
+* `WordPress/wp-content/themes/twentytwelve/index.php`
+* `WordPress/.htaccess`
+* `WordPress/wp-content/plugins/CakePress/*`
+* `cakephp/app` (a single-model CakePHP application, as a demo)
+* `cakephp/app/webroot/index.php`
+
 
 ## Configuration
 
-- The repo contains both WordPress and CakePHP codebases in the proper locations.  The CakePHP directory should be named "cakephp" and be a sibling to the WordPress one, i.e., your WORDPRESS_ROOT is `/path/to/www/WordPress` and your CAKEPHP_ROOT is `/path/to/www/cakephp`.
-- Add the following Apache Alias, used for delivering existing files from under `CAKEPHP_ROOT/app/webroot`, to the WordPress VirtualHost. This should point to the `app/webroot` directory of the CakePHP app.
+* The repo contains both WordPress and CakePHP codebases in the proper locations.  The CakePHP directory should be named "cakephp" and be a sibling to the WordPress one, i.e., your WORDPRESS_ROOT is `/path/to/www/WordPress` and your CAKEPHP_ROOT is `/path/to/www/cakephp`.
+* Add the following Apache Alias, used for delivering existing files from under `CAKEPHP_ROOT/app/webroot`, to the WordPress VirtualHost. This should point to the `app/webroot` directory of the CakePHP app.
 
 ```
 Alias /webapp "CAKEPHP_ROOT/app/webroot"
@@ -23,13 +25,14 @@ Alias /webapp "CAKEPHP_ROOT/app/webroot"
     Allow from all
 </Directory>
 ```
-- Enable URL rewriting on both your WORDPRESS_ROOT and CAKEPHP_ROOT
-- Bounce Apache
+
+* Enable URL rewriting on both your WORDPRESS_ROOT and CAKEPHP_ROOT
+* Bounce Apache
 
 
 ## Usage
 
-After configuration, your CakePHP app is available as-is at `http://wordpressserver/app/`, so you can do stuff like this in your CakePHP app:
+After configuration, your CakePHP app is available at `http://wordpressserver/app/`.  You can do stuff like this in your CakePHP controller:
 ```php
 
     function beforeFilter() {

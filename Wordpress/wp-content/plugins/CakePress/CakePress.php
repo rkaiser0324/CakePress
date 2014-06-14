@@ -48,11 +48,9 @@ class CakePressPlugin {
         $cakeDispatcher->setIgnoreParameters(array('option', 'jrun', 'task', 'url'));
         $cakeDispatcher->setRestoreSession(true);
 
-        logfile('before get');
+        //logfile('before get');
         $arr = $cakeDispatcher->get($this->_url);
-        //print_r($arr);die();
-
-        logfile('after get');
+        //logfile('after get');
 
         if (!empty($arr['head']['stylesheets'])) {
             for ($i = 0; $i < count($arr['head']['stylesheets']); $i++) {
@@ -66,40 +64,12 @@ class CakePressPlugin {
         }
         $this->_output = $arr['body'];
         $this->_title = $arr['head']['title'];
-        var_dump($arr);
 
-        //add_filter('the_content', array($this, 'pippin_filter_content_sample'));
-        // See http://wordpress.org/support/topic/how-do-i-create-a-new-page-with-the-plugin-im-building#post-1557249
-        //add_filter( 'the_posts', array($this, 'my_plugin_page_filter' ));
         add_filter('the_content', array($this, 'replace_page_content'));
-        //add_filter('the_title', array($this, 'replace_page_title'), 100);
-        //add_filter('wp_title', array($this, 'replace_page_head_title'), 100, 3);
-        //add_filter('the_content', array($this, 'getOutput'));
-//            add_filter('the_content', function () {
-//                return $arr['body'];
-//            });
-        //$this->_output = $arr['body'];
+        add_filter('the_title', array($this, 'replace_page_title'), 100);
+        add_filter('wp_title', array($this, 'replace_page_head_title'), 100, 3);
     }
 
-//    function pippin_filter_content_sample($content) {
-//        if (is_singular() && is_main_query()) {
-//            $new_content = '<p>This is added to the bottom of all post and page content, as well as custom post types.</p>';
-//            $content .= $new_content;
-//        }
-//        return $content;
-//    }
-//    function my_plugin_page_filter($posts) {
-//
-//        global $wp_query;
-//
-//        //if ($wp_query->get('my_plugin_page_is_called')) {
-//
-//        $posts[0]->post_title = 'The Page Title';
-//        $posts[0]->post_content = $this->_output;
-//        // }
-//
-//        return $posts;
-//    }
     // Simple helper function to aid in debugging
     private function debug($s) {
         echo '<pre style="padding:20px;background-color:yellow;font-size:larger">';
@@ -107,19 +77,17 @@ class CakePressPlugin {
         echo "</pre>";
     }
 
-    function getOutput() {
-        //return 'hi';
-        return $this->_output;
-    }
-
     /**
-     * Replace the page content.
+     * Replace the page content. See https://pippinsplugins.com/playing-nice-with-the-content-filter/
      * 
      * @param string $content
      * @return string
      */
     function replace_page_content($content) {
-        return $this->_output;
+        if (is_singular() && is_main_query()) {
+            $content = $this->_output;
+        }
+        return $content;
     }
 
     /**
@@ -135,27 +103,19 @@ class CakePressPlugin {
     }
 
     /**
-     * Replace the page title used in the banner, body and the breadcrumbs.
-     * 
-     * http://stackoverflow.com/questions/7878187/changing-wp-title-from-inside-my-wordpress-plugin
+     * Replace the title inside the page body.
+     *
+     * http://wordpress.stackexchange.com/questions/30529/how-to-change-wordpress-post-title 
      * http://codex.wordpress.org/Plugin_API/Filter_Reference/the_title
      * 
      * @param string $content
      * @return string
      */
     function replace_page_title($content) {
-        return $this->_title;
+        return in_the_loop() ? $this->_title : $content;
     }
 
 }
-
-//
-//            function my_the_post_action( $post_object ) {
-//	var_dump($post_object);
-//        //die();
-//}
-//add_action( 'the_post', 'my_the_post_action' );
-// Load the plugin hooks, etc.
 $cakepress_plugin = new CakePressPlugin();
 
 
