@@ -16,10 +16,12 @@ class CakePressPlugin {
 
     function __construct() {
 
-        if (preg_match('/^\/app/', $_SERVER['REQUEST_URI']))
+        if (preg_match('/^\/app\//', $_SERVER['REQUEST_URI']))
             $this->_url = str_replace('/app', '', $_SERVER['REQUEST_URI']);
         elseif (preg_match('/\?option=com_jake&jrun=/', $_SERVER['REQUEST_URI']))
             $this->_url = str_replace('/?option=com_jake&jrun=', '', $_SERVER['REQUEST_URI']);
+        elseif ($_SERVER['REQUEST_URI'] == '/app')
+            $this->_url = '/';
 
         if (!empty($this->_url)) {
             define('JAKE', 1);
@@ -48,9 +50,9 @@ class CakePressPlugin {
         $cakeDispatcher->setIgnoreParameters(array('option', 'jrun', 'task', 'url'));
         $cakeDispatcher->setRestoreSession(true);
 
-        logfile('before get');
+        //logfile('before get');
         $arr = $cakeDispatcher->get($this->_url);
-        logfile('after get');
+        //logfile('after get');
 
         if (!empty($arr['head']['stylesheets'])) {
             for ($i = 0; $i < count($arr['head']['stylesheets']); $i++) {
@@ -65,45 +67,40 @@ class CakePressPlugin {
         $this->_output = $arr['body'];
         $this->_title = $arr['head']['title'];
 
-        add_filter('404_template', array( $this, 'maybe_use_custom_404_template' ) );
-        add_filter('the_content', array($this, 'replacePageContent'));
-        add_filter('the_title', array($this, 'replacePageTitle'), 100);
+        add_filter('404_template', array($this, 'maybe_use_custom_404_template'));
         add_filter('wp_title', array($this, 'replacePageHeadTitle'), 100, 3);
     }
-    
+
     // Inspired by https://wordpress.org/plugins/custom-404-error-page/
-    function maybe_use_custom_404_template( $template ) {
-//         $templates = wp_get_theme()->get_page_templates();
-//    foreach ( $templates as $template_name => $template_filename ) {
-//        echo "$template_name ($template_filename)<br />";
-//    }
+    // http://www.blogseye.com/creating-fake-wordpress-posts-on-the-fly/
+    function maybe_use_custom_404_template($template) {
         global $wp_query, $post;
 
-                     
-        			// Get our custom 404 post object. We need to assign
-			// $post global in order to force get_post() to work
-			// during page template resolving.
-			$post = get_post(11);
-                        $post->post_content = $this->_output;
-                        //var_dump($post);
+        $post = new stdClass();
+        $post->ID = -1;
+        $post->post_author = '';
+        $post->post_date = '';
+        $post->ancestors = array();
+        $post->post_category = array('uncategorized');
+        $post->post_excerpt = ''; //For all your post excerpt needs.
+        $post->post_status = 'publish'; //Set the status of the new post.
+        $post->post_title = $this->_title; //The title of your post.
+        $post->post_type = 'page'; //Sometimes you might want to post a page.
+        $post->post_content = $this->_output;
 
-			// Populate the posts array with our 404 page object
-			$wp_query->posts = array( $post );
+        // Populate the posts array with our 404 page object
+        $wp_query->posts = array($post);
 
-			// Set the query object to enable support for custom page templates
-			$wp_query->queried_object_id = 11;
-			$wp_query->queried_object = $post;
-			
-			// Set post counters to avoid loop errors
-			$wp_query->post_count = 1;
-			$wp_query->found_posts = 1;
-			$wp_query->max_num_pages = 0;
-                        
-                        return get_page_template();
-                        
-//        return (get_template_directory() . DIRECTORY_SEPARATOR . 'index.php');
-//        die(theme_directory());
-//        die($template);
+        // Set the query object to enable support for custom page templates
+        $wp_query->queried_object_id = $post->ID;
+        $wp_query->queried_object = $post;
+
+        // Set post counters to avoid loop errors
+        $wp_query->post_count = 1;
+        $wp_query->found_posts = 1;
+        $wp_query->max_num_pages = 0;
+
+        return get_page_template();
     }
 
     // Simple helper function to aid in debugging
@@ -138,30 +135,6 @@ class CakePressPlugin {
         return $this->_title;
     }
 
-    /**
-     * Replace the title inside the page body.
-     *
-     * http://wordpress.stackexchange.com/questions/30529/how-to-change-wordpress-post-title 
-     * http://codex.wordpress.org/Plugin_API/Filter_Reference/the_title
-     * 
-     * @param string $content
-     * @return string
-     */
-    function replacePageTitle($content) {
-        return in_the_loop() ? $this->_title : $content;
-    }
-
 }
+
 $cakepress_plugin = new CakePressPlugin();
-//
-//add_filter('template_redirect', 'my_404_override' );
-//function my_404_override() {
-//    global $wp_query;
-//
-//    if (true) {
-//        //status_header( 200 );
-//        $wp_query->is_404=false;
-//    }
-//}
-
-

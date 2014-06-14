@@ -26,6 +26,7 @@ Alias /webapp "CAKEPHP_ROOT/app/webroot"
 
 * Enable URL rewriting on both your WORDPRESS_ROOT and CAKEPHP_ROOT
 * Bounce Apache
+* If you are using the WP Super Cache plugin, on the Advanced Settings, make sure that you add the string "app" to the list of URL strings to leave uncached.
 
 
 ## Usage

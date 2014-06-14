@@ -21,7 +21,8 @@ RewriteCond     %{DOCUMENT_ROOT}/../%{ENV:path_to_check} -d
 RewriteRule     ^app\/(.*)$     /webapp/$1                                      [QSA,L]
 
 # And finally, handle everything remaining as an ordinary Cake action
-RewriteRule	^app(.*)$	/index.php?option=com_jake&jrun=$1		[QSA,L]
+RewriteRule	^app$           /index.php?option=com_jake&jrun=/               [QSA,L]
+RewriteRule	^app(.+)$	/index.php?option=com_jake&jrun=$1		[QSA,L]
 
 # End CakePress
 
