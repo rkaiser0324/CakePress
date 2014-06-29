@@ -8,6 +8,8 @@ RewriteBase /
 # We need to handle everything that starts with "app"
 # See http://www.phpbb-seo.com/en/apache-mod-rewrite/article3226.html and http://blog.echothis.com/2009/07/22/search-engine-friendly-urls-using-the-jake-bridge/
 
+RewriteRule     ^app\/webroot\/(.*)$     /app/$1                                [QSA,L]
+
 # First, redirect any static assets to /webapp/* as per http://www.askapache.com/htaccess/setenvif.html
 # Note use of (.+) to make sure that /app/ itself is skipped here
 

@@ -4,8 +4,6 @@
  *
  * The Front Controller for handling every request
  *
- * PHP 5
- *
  * CakePHP(tm) : Rapid Development Framework (http://cakephp.org)
  * Copyright (c) Cake Software Foundation, Inc. (http://cakefoundation.org)
  *
@@ -76,9 +74,7 @@ if (defined('JAKE')) {
         define('FULL_BASE_URL', 'http' . $s . '://' . $httpHost . '/app');
     }
     unset($httpHost, $s);
-}
-
-/**
+}/**
  * Editing below this line should NOT be necessary.
  * Change at your own risk.
  *
@@ -91,7 +87,7 @@ if (!defined('WWW_ROOT')) {
 }
 
 // for built-in server
-if (php_sapi_name() == 'cli-server') {
+if (php_sapi_name() === 'cli-server') {
 	if ($_SERVER['REQUEST_URI'] !== '/' && file_exists(WWW_ROOT . $_SERVER['PHP_SELF'])) {
 		return false;
 	}
@@ -102,11 +98,11 @@ if (!defined('CAKE_CORE_INCLUDE_PATH')) {
 	if (function_exists('ini_set')) {
 		ini_set('include_path', ROOT . DS . 'lib' . PATH_SEPARATOR . ini_get('include_path'));
 	}
-	if (!include ('Cake' . DS . 'bootstrap.php')) {
+	if (!include 'Cake' . DS . 'bootstrap.php') {
 		$failed = true;
 	}
 } else {
-	if (!include (CAKE_CORE_INCLUDE_PATH . DS . 'Cake' . DS . 'bootstrap.php')) {
+	if (!include CAKE_CORE_INCLUDE_PATH . DS . 'Cake' . DS . 'bootstrap.php') {
 		$failed = true;
 	}
 }
@@ -115,11 +111,11 @@ if (!empty($failed)) {
 }
 
 App::uses('Dispatcher', 'Routing');
+
 $Dispatcher = new Dispatcher();
 $r = new CakeRequest();
 if (defined('JAKE'))
 {
-
     $r->url = $url;
     $r->here = $url;
     unset($url);
@@ -127,8 +123,7 @@ if (defined('JAKE'))
     class JakeResponse extends CakeResponse
     {
     /**
-     * Sends the response to the client, without some headers - e.g., the Content-Length header shouldn't be set 
-     * explicitly because Joomla doesn't set it, and anything Cake would set, would be wrong in this case.
+     * Sends the response to the client, without the Content-Length and Content-Type headers.
      *
      * @return void
      */
@@ -143,13 +138,13 @@ if (defined('JAKE'))
                     }
                     if ($this->_file) {
                             $this->_sendFile($this->_file);
-                            $this->_file = null;
+                            $this->_file = $this->_fileRange = null;
                     } else {
                             $this->_sendContent($this->_body);
                     }
             }
     }
-    $Dispatcher->dispatch($r, new JakeResponse(array('charset' => Configure::read('App.encoding'))));
+    $Dispatcher->dispatch($r, new JakeResponse());
 }
 else
-    $Dispatcher->dispatch($r, new CakeResponse(array('charset' => Configure::read('App.encoding'))));
+    $Dispatcher->dispatch($r, new CakeResponse());

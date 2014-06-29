@@ -394,7 +394,6 @@ class CakeEmbeddedDispatcher
 		{
 			$html = $this->_changeReferences($html);
 		}
-                
 		
 		// If no further job is needed (such as for AJAX) give back the output
 		
@@ -416,8 +415,7 @@ class CakeEmbeddedDispatcher
 		$err = $this->pcre_error_decode();
 		if ($err != null)
 			$pcre_errors[] = 'Jake error in cake_embedded_dispatcher.class.php (head): ' . $err;
-		
-		
+
 		if (!empty($head))
 		{
 			// Get elements within head
@@ -644,12 +642,16 @@ class CakeEmbeddedDispatcher
 	function _changeReferences($html)
 	{
 		$result = $html;
+                /*
 		
 		// Change relative references to resources
 		
 		$result = preg_replace('/<link([^>]*?)href="(\/[^"]*+)"([^>]*?)>/i', '<link\\1href="' . $this->cakeUrlBase . '\\2"\\3>', $result);
 		$result = preg_replace('/<(img|style|script)([^>]*?)src="(\/[^"]*+)"([^>]*?)>/i', '<\\1\\2src="' . $this->cakeUrlBase . '\\3"\\4>', $result);
 		
+                // Fix the protocol-less resources
+                $result = str_replace($this->cakeUrlBase . '//', '//', $result);
+                
 		// Change relative CakePHP links
 		
 		if (!empty($this->component))
@@ -658,7 +660,7 @@ class CakeEmbeddedDispatcher
 			$result = preg_replace('/<form([^>]*?)action="(\/[^"]*+)"([^>]*?)>/ie', "\$this->_changeUrl('<form', '$1', '$2', '$3', '>', 'action=\"')", $result);
 			$result = preg_replace('/Ajax\.Updater\(' . '(\'[^\']*?\')' . '(,\')' . '([^\']*+)' . '(\')/ie', "\$this->_changeUrl('Ajax.Updater($1', '$2', '$3', '', '', '', '\'', true, true)", $result);
 		}
-		
+		*/
 		return $result;
 	}
 	

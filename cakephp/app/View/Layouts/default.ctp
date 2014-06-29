@@ -31,6 +31,8 @@ $cakeVersion = __d('cake_dev', 'CakePHP %s', Configure::version())
 		echo $this->Html->meta('icon');
 
 		echo $this->Html->css('cake.generic');
+                echo $this->Html->script('local');
+                echo $this->Html->script('//cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js');
 
 		echo $this->fetch('meta');
 		echo $this->fetch('css');
@@ -43,7 +45,7 @@ $cakeVersion = __d('cake_dev', 'CakePHP %s', Configure::version())
 			<h1><?php echo $this->Html->link($cakeDescription, 'http://cakephp.org'); ?></h1>
 		</div>
 		<div id="content">
-
+                        <h2>Hello <?php echo empty($wordpress_user->data->user_login) ? 'Anonymous' : $wordpress_user->data->user_login ?></h2>
 			<?php echo $this->Session->flash(); ?>
 
 			<?php echo $this->fetch('content'); ?>
