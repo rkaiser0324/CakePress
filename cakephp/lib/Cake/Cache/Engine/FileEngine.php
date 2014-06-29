@@ -6,8 +6,6 @@
  *
  * You can configure a FileEngine cache, using Cache::config()
  *
- * PHP 5
- *
  * CakePHP(tm) : Rapid Development Framework (http://cakephp.org)
  * Copyright (c) Cake Software Foundation, Inc. (http://cakefoundation.org)
  *
@@ -44,7 +42,7 @@ class FileEngine extends CacheEngine {
  *
  * - path = absolute path to cache directory, default => CACHE
  * - prefix = string prefix for filename, default => cake_
- * - lock = enable file locking on write, default => false
+ * - lock = enable file locking on write, default => true
  * - serialize = serialize the data, default => true
  *
  * @var array
@@ -210,7 +208,10 @@ class FileEngine extends CacheEngine {
 		}
 		$path = $this->_File->getRealPath();
 		$this->_File = null;
-		return unlink($path);
+
+		//@codingStandardsIgnoreStart
+		return @unlink($path);
+		//@codingStandardsIgnoreEnd
 	}
 
 /**
@@ -223,6 +224,8 @@ class FileEngine extends CacheEngine {
 		if (!$this->_init) {
 			return false;
 		}
+		$this->_File = null;
+
 		$threshold = $now = false;
 		if ($check) {
 			$now = time();
@@ -233,11 +236,17 @@ class FileEngine extends CacheEngine {
 
 		$directory = new RecursiveDirectoryIterator($this->settings['path']);
 		$contents = new RecursiveIteratorIterator($directory, RecursiveIteratorIterator::SELF_FIRST);
+		$cleared = array();
 		foreach ($contents as $path) {
 			if ($path->isFile()) {
 				continue;
 			}
-			$this->_clearDirectory($path->getRealPath() . DS, $now, $threshold);
+
+			$path = $path->getRealPath() . DS;
+			if (!in_array($path, $cleared)) {
+				$this->_clearDirectory($path, $now, $threshold);
+				$cleared[] = $path;
+			}
 		}
 		return true;
 	}
@@ -263,7 +272,7 @@ class FileEngine extends CacheEngine {
 				continue;
 			}
 			$filePath = $path . $entry;
-			if (is_dir($filePath)) {
+			if (!file_exists($filePath) || is_dir($filePath)) {
 				continue;
 			}
 			$file = new SplFileObject($path . $entry, 'r');
@@ -281,7 +290,12 @@ class FileEngine extends CacheEngine {
 				}
 			}
 			if ($file->isFile()) {
-				unlink($file->getRealPath());
+				$filePath = $file->getRealPath();
+				$file = null;
+
+				//@codingStandardsIgnoreStart
+				@unlink($filePath);
+				//@codingStandardsIgnoreEnd
 			}
 		}
 	}
@@ -289,8 +303,8 @@ class FileEngine extends CacheEngine {
 /**
  * Not implemented
  *
- * @param string $key
- * @param integer $offset
+ * @param string $key The key to decrement
+ * @param integer $offset The number to offset
  * @return void
  * @throws CacheException
  */
@@ -301,8 +315,8 @@ class FileEngine extends CacheEngine {
 /**
  * Not implemented
  *
- * @param string $key
- * @param integer $offset
+ * @param string $key The key to decrement
+ * @param integer $offset The number to offset
  * @return void
  * @throws CacheException
  */
@@ -326,7 +340,7 @@ class FileEngine extends CacheEngine {
 		$dir = $this->settings['path'] . $groups;
 
 		if (!is_dir($dir)) {
-			mkdir($dir, 0777, true);
+			mkdir($dir, 0775, true);
 		}
 		$path = new SplFileInfo($dir . $key);
 
@@ -359,6 +373,12 @@ class FileEngine extends CacheEngine {
  */
 	protected function _active() {
 		$dir = new SplFileInfo($this->settings['path']);
+		if (Configure::read('debug')) {
+			$path = $dir->getPathname();
+			if (!is_dir($path)) {
+				mkdir($path, 0775, true);
+			}
+		}
 		if ($this->_init && !($dir->isDir() && $dir->isWritable())) {
 			$this->_init = false;
 			trigger_error(__d('cake_dev', '%s is not writable', $this->settings['path']), E_USER_WARNING);
@@ -378,26 +398,34 @@ class FileEngine extends CacheEngine {
 			return false;
 		}
 
-		$key = Inflector::underscore(str_replace(array(DS, '/', '.'), '_', strval($key)));
+		$key = Inflector::underscore(str_replace(array(DS, '/', '.', '<', '>', '?', ':', '|', '*', '"'), '_', strval($key)));
 		return $key;
 	}
 
 /**
  * Recursively deletes all files under any directory named as $group
  *
+ * @param string $group The group to clear.
  * @return boolean success
  */
 	public function clearGroup($group) {
+		$this->_File = null;
 		$directoryIterator = new RecursiveDirectoryIterator($this->settings['path']);
 		$contents = new RecursiveIteratorIterator($directoryIterator, RecursiveIteratorIterator::CHILD_FIRST);
 		foreach ($contents as $object) {
 			$containsGroup = strpos($object->getPathName(), DS . $group . DS) !== false;
-			$hasPrefix = strpos($object->getBaseName(), $this->settings['prefix']) === 0;
+			$hasPrefix = true;
+			if (strlen($this->settings['prefix']) !== 0) {
+				$hasPrefix = strpos($object->getBaseName(), $this->settings['prefix']) === 0;
+			}
 			if ($object->isFile() && $containsGroup && $hasPrefix) {
-				unlink($object->getPathName());
+				$path = $object->getPathName();
+				$object = null;
+				//@codingStandardsIgnoreStart
+				@unlink($path);
+				//@codingStandardsIgnoreEnd
 			}
 		}
-		$this->_File = null;
 		return true;
 	}
 }

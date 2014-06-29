@@ -4,8 +4,6 @@
  *
  * Enables a model object to act as a node-based tree.
  *
- * PHP 5
- *
  * CakePHP(tm) Tests <http://book.cakephp.org/2.0/en/development/testing.html>
  * Copyright (c) Cake Software Foundation, Inc. (http://cakefoundation.org)
  *
@@ -35,11 +33,11 @@ class NumberTreeTwoFixture extends CakeTestFixture {
  * @var array
  */
 	public $fields = array(
-		'id'	=> array('type' => 'integer','key' => 'primary'),
-		'name'	=> array('type' => 'string','null' => false),
+		'id'	=> array('type' => 'integer', 'key' => 'primary'),
+		'name'	=> array('type' => 'string', 'null' => false),
 		'number_tree_id' => array('type' => 'integer', 'null' => false),
 		'parent_id' => 'integer',
-		'lft'	=> array('type' => 'integer','null' => false),
-		'rght'	=> array('type' => 'integer','null' => false)
+		'lft'	=> array('type' => 'integer', 'null' => false),
+		'rght'	=> array('type' => 'integer', 'null' => false)
 	);
 }
