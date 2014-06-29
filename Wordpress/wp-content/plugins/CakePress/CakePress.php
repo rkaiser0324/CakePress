@@ -10,8 +10,7 @@
 
 class CakePressPlugin {
 
-    var $_output = '';
-    var $_title = '';
+    var $_arr = array();
     var $_url = '';
 
     function __construct() {
@@ -50,25 +49,30 @@ class CakePressPlugin {
         $cakeDispatcher->setIgnoreParameters(array('option', 'jrun', 'task', 'url'));
         $cakeDispatcher->setRestoreSession(true);
 
-        //logfile('before get');
-        $arr = $cakeDispatcher->get($this->_url);
-        //logfile('after get');
+        $this->_arr = $cakeDispatcher->get($this->_url);
 
-        if (!empty($arr['head']['stylesheets'])) {
-            for ($i = 0; $i < count($arr['head']['stylesheets']); $i++) {
-                wp_enqueue_style('cake_stylesheet_' . $i, $arr['head']['stylesheets'][$i]['href']);
-            }
-        }
-        if (!empty($arr['head']['script'])) {
-            for ($i = 0; $i < count($arr['head']['script']); $i++) {
-                wp_enqueue_script('cake_script_' . $i, $arr['head']['script'][$i]['src']);
-            }
-        }
-        $this->_output = $arr['body'];
-        $this->_title = $arr['head']['title'];
-
+        // Enqueue the CakePHP JS and CSS assets last.
+        add_action('wp_enqueue_scripts', array($this, 'enqueue_cakephp_assets'), 100);
+        
         add_filter('404_template', array($this, 'maybe_use_custom_404_template'));
         add_filter('wp_title', array($this, 'replacePageHeadTitle'), 100, 3);
+    }
+    
+    /**
+     * Action to enqueue the CakePHP JS and CSS assets.
+     */
+    function enqueue_cakephp_assets()
+    {
+        if (!empty($this->_arr['head']['stylesheets'])) {
+            for ($i = 0; $i < count($this->_arr['head']['stylesheets']); $i++) {
+                wp_enqueue_style('cake_stylesheet_' . $i, $this->_arr['head']['stylesheets'][$i]['href']);
+            }
+        }
+        if (!empty($this->_arr['head']['script'])) {
+            for ($i = 0; $i < count($this->_arr['head']['script']); $i++) {
+                wp_enqueue_script('cake_script_' . $i, $this->_arr['head']['script'][$i]['src']);
+            }
+        }
     }
 
     // Inspired by https://wordpress.org/plugins/custom-404-error-page/
@@ -84,9 +88,9 @@ class CakePressPlugin {
         $post->post_category = array('uncategorized');
         $post->post_excerpt = ''; //For all your post excerpt needs.
         $post->post_status = 'publish'; //Set the status of the new post.
-        $post->post_title = $this->_title; //The title of your post.
+        $post->post_title = $this->_arr['head']['title']; //The title of your post.
         $post->post_type = 'page'; //Sometimes you might want to post a page.
-        $post->post_content = $this->_output;
+        $post->post_content = $this->_arr['body'];
 
         // Populate the posts array with our 404 page object
         $wp_query->posts = array($post);
@@ -118,7 +122,7 @@ class CakePressPlugin {
      */
     function replacePageContent($content) {
         if (is_singular() && is_main_query()) {
-            $content = $this->_output;
+            $content = $this->_arr['body'];
         }
         return $content;
     }
@@ -132,7 +136,7 @@ class CakePressPlugin {
      * @return string
      */
     function replacePageHeadTitle($title, $sep, $sep_location) {
-        return $this->_title;
+        return $this->_arr['head']['title'];
     }
 
 }

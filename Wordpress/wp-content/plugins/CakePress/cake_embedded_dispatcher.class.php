@@ -388,13 +388,6 @@ class CakeEmbeddedDispatcher
 		
 		$html = ob_get_clean();
 		
-		// Modify references to CakePHP URLs
-		
-		if (!empty($this->cakeUrlBase))
-		{
-			$html = $this->_changeReferences($html);
-		}
-		
 		// If no further job is needed (such as for AJAX) give back the output
 		
 		if ($this->cleanOutput)
@@ -628,112 +621,5 @@ class CakeEmbeddedDispatcher
 
 		return $result;
 	}	
-	
-	/**
-	 * Change URL references so they pass through the component
-	 * 
-	 * @param string $html	HTML body
-	 * 
-	 * @return string	Modified contents
-	 * 
-	 * @access private
-	 * @since 1.0
-	 */
-	function _changeReferences($html)
-	{
-		$result = $html;
-                /*
-		
-		// Change relative references to resources
-		
-		$result = preg_replace('/<link([^>]*?)href="(\/[^"]*+)"([^>]*?)>/i', '<link\\1href="' . $this->cakeUrlBase . '\\2"\\3>', $result);
-		$result = preg_replace('/<(img|style|script)([^>]*?)src="(\/[^"]*+)"([^>]*?)>/i', '<\\1\\2src="' . $this->cakeUrlBase . '\\3"\\4>', $result);
-		
-                // Fix the protocol-less resources
-                $result = str_replace($this->cakeUrlBase . '//', '//', $result);
-                
-		// Change relative CakePHP links
-		
-		if (!empty($this->component))
-		{
-			$result = preg_replace('/<a([^>]*?)href="(\/[^"]*+)"([^>]*?)>/ie', "\$this->_changeUrl('<a', '$1', '$2', '$3', '>')", $result);
-			$result = preg_replace('/<form([^>]*?)action="(\/[^"]*+)"([^>]*?)>/ie', "\$this->_changeUrl('<form', '$1', '$2', '$3', '>', 'action=\"')", $result);
-			$result = preg_replace('/Ajax\.Updater\(' . '(\'[^\']*?\')' . '(,\')' . '([^\']*+)' . '(\')/ie', "\$this->_changeUrl('Ajax.Updater($1', '$2', '$3', '', '', '', '\'', true, true)", $result);
-		}
-		*/
-		return $result;
-	}
-	
-	/**
-	 * Modify a URL to pass through the component (called by preg_replace)
-	 * 
-	 * @param string $start
-	 * @param string $p1
-	 * @param string $url
-	 * @param string $p3
-	 * @param string $ending
-	 * @param string $startUrl
-	 * @param string $endUrl
-	 * @param bool $useComponent
-	 * @param bool $clean
-	 * 
-	 * @return string	Modified URL
-	 * 
-	 * @access private
-	 * @since 1.0
-	 */
-	function _changeUrl($start, $p1, $url, $p3, $ending, $startUrl='href="', $endUrl='"', $useComponent = true, $clean = false)
-	{
-		if (isset($this->sefCakeApplicationBase))
-		{
-			$newUrl = $this->sefCakeApplicationBase . $url;
-		}
-		else
-		{
-			// Patterns to match URLs that should not pass through the component
-			
-			$passThroughLinksMatching = array('/\.jpg$/i', '/\.png$/i', '/\.gif$/i', '/\.pdf$/i', '/\.rss$/i');
-			
-			if ($useComponent && isset($passThroughLinksMatching))
-			{
-				foreach($passThroughLinksMatching as $element)
-				{
-					if (preg_match($element, $url))
-					{
-						$useComponent = false;
-						break;
-					}
-				}
-			}
-			
-			if ($useComponent)
-			{
-				$newUrl = str_replace('$CAKE_ACTION', urlencode($url), $this->component);
-				
-				if (!empty($this->cakeUrlAddParameters))
-				{
-					$newUrl .= '&amp;' . $this->cakeUrlAddParameters;
-				}
-				
-				if ($clean)
-				{
-					$newUrl .= '&amp;' . $this->cleanOutputParameter;
-				}
-			}
-			else
-			{
-				$newUrl = $this->cakeUrlBase . $url;
-			}
-		}
-		
-		$newUrl = str_replace('&amp;', '&', $newUrl);
-		
-		$result = $start . $p1;
-		$result .= $startUrl . $newUrl . $endUrl;
-		$result .= $p3 . $ending;
-		
-		$result = stripslashes($result);
 
-		return $result;
-	}
 }
