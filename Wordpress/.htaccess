@@ -3,12 +3,6 @@
 RewriteEngine On
 RewriteBase /
 
-# BEGIN CakePress
-
-# Use the /webapp Alias for serving asset files
-RewriteRule     ^app\/webroot\/(.*)$     /webapp/$1                                [QSA,L]
-
-# End CakePress
 
 RewriteRule ^index\.php$ - [L]
 RewriteCond %{REQUEST_FILENAME} !-f

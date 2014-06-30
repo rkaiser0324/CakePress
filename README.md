@@ -3,12 +3,12 @@ CakePress
 
 CakePress is a Wordpress plugin to integrate a CakePHP web application into Wordpress.  It is based on the [Jake project](https://github.com/rkaiser0324/jake), which does the same for Joomla.
 
-This project contains sample CakePHP 2.5.1 and WordPress 3.9.1 codebases, as a demonstration.  But all the magic specific to this plugin is contained in the following files:
+This project contains sample CakePHP 2.5.1 and WordPress 3.9.1 codebases, as a demonstration.  But all the magic is contained in the following files:
 
-* `WordPress/.htaccess`
 * `WordPress/wp-content/plugins/CakePress/*`
 * `cakephp/app/webroot/index.php`
 
+It requires Apache 2.2.2, with mod_rewrite enabled.
 
 ## Configuration
 
@@ -16,7 +16,7 @@ This project contains sample CakePHP 2.5.1 and WordPress 3.9.1 codebases, as a d
 * Add the following Apache Alias, used for delivering existing files from under `CAKEPHP_ROOT/app/webroot`, to the WordPress VirtualHost. This should point to the `app/webroot` directory of the CakePHP app.
 
 ```
-Alias /webapp "CAKEPHP_ROOT/app/webroot"
+Alias /app/webroot "CAKEPHP_ROOT/app/webroot"
 <Directory "CAKEPHP_ROOT/app/webroot">
     AllowOverride All
     Order allow,deny
@@ -27,11 +27,11 @@ Alias /webapp "CAKEPHP_ROOT/app/webroot"
 * Enable URL rewriting on both your WORDPRESS_ROOT and CAKEPHP_ROOT
 * Bounce Apache
 
-## Plugins
-The following optional plugins require additional configuration if they are used:
+### Plugins
+If used, the following WordPress plugins require additional configuration:
 
 * WP Super Cache - On the Advanced Settings, make sure that you add the string "app" to the list of URL strings to leave uncached.
-* Autoptimize - Add `app` to "Exclude scripts from Autoptimize" and "Exclude CSS from Autoptimize".  Due to the nonstandard location of these assets, the plugin is not able to follow the URL aliases to them.
+* Autoptimize - Add `app` to "Exclude scripts from Autoptimize" and "Exclude CSS from Autoptimize".  Due to the nonstandard location of these assets, the plugin is not able to follow the URL aliases to them, so the CakePHP assets cannot be minified.
 
 
 ## Usage
