@@ -2,7 +2,7 @@
 
 /*
   Plugin Name: CakePress Plugin
-  Version: 1.1.0
+  Version: 1.1.1
   Description: Allows WordPress to host a CakePHP web application.
   Author: Rolf Kaiser
   Author URI: https://github.com/rkaiser0324/CakePress
@@ -17,8 +17,6 @@ class CakePressPlugin {
 
         if (preg_match('/^\/app\//', $_SERVER['REQUEST_URI']))
             $this->_url = str_replace('/app', '', $_SERVER['REQUEST_URI']);
-        elseif (preg_match('/\?option=com_jake&jrun=/', $_SERVER['REQUEST_URI']))
-            $this->_url = str_replace('/?option=com_jake&jrun=', '', $_SERVER['REQUEST_URI']);
         elseif ($_SERVER['REQUEST_URI'] == '/app')
             $this->_url = '/';
 
@@ -40,8 +38,6 @@ class CakePressPlugin {
         $cakeDispatcher = new CakeEmbeddedDispatcher();
         $cakeDispatcher->setCakePath(dirname(ABSPATH) . DIRECTORY_SEPARATOR . 'cakephp');
         $cakeDispatcher->setCakeUrlBase('/app');
-
-        // Set the SEF URL to match the rewrite rule in /.htaccess
         $cakeDispatcher->setSefCakeApplicationBase('/app');
         $cakeDispatcher->setComponent('/index.php?option=com_jake&jrun=$CAKE_ACTION');
         $cakeDispatcher->setCleanOutput(false);
@@ -51,17 +47,17 @@ class CakePressPlugin {
 
         $this->_arr = $cakeDispatcher->get($this->_url);
 
-        // Enqueue the CakePHP JS and CSS assets last.
-        add_action('wp_enqueue_scripts', array($this, 'enqueue_cakephp_assets'), 100);
+        // Enqueue the CakePHP JS and CSS assets last
+        add_action('wp_enqueue_scripts', array($this, 'enqueueCakephpAssets'), 100);
         
-        add_filter('404_template', array($this, 'maybe_use_custom_404_template'));
+        add_filter('404_template', array($this, 'custom404Template'));
         add_filter('wp_title', array($this, 'replacePageHeadTitle'), 100, 3);
     }
     
     /**
-     * Action to enqueue the CakePHP JS and CSS assets.
+     * Enqueue the CakePHP JS and CSS assets.
      */
-    function enqueue_cakephp_assets()
+    function enqueueCakephpAssets()
     {
         if (!empty($this->_arr['head']['stylesheets'])) {
             for ($i = 0; $i < count($this->_arr['head']['stylesheets']); $i++) {
@@ -77,7 +73,7 @@ class CakePressPlugin {
 
     // Inspired by https://wordpress.org/plugins/custom-404-error-page/
     // http://www.blogseye.com/creating-fake-wordpress-posts-on-the-fly/
-    function maybe_use_custom_404_template($template) {
+    function custom404Template($template) {
         global $wp_query, $post;
 
         $post = new stdClass();
@@ -104,7 +100,7 @@ class CakePressPlugin {
         $wp_query->found_posts = 1;
         $wp_query->max_num_pages = 0;
         
-		// See http://wordpress.stackexchange.com/questions/66331/how-does-one-suppress-a-404-status-code-in-a-wordpress-page
+	// See http://wordpress.stackexchange.com/questions/66331/how-does-one-suppress-a-404-status-code-in-a-wordpress-page
         status_header(200);
 
         return get_page_template();

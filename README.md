@@ -30,8 +30,8 @@ Alias /app/webroot "CAKEPHP_ROOT/app/webroot"
 ### Plugins
 If used, the following WordPress plugins require additional configuration:
 
-* WP Super Cache - On the Advanced Settings, make sure that you add the string "app" to the list of URL strings to leave uncached.
-* Autoptimize - Add `app` to "Exclude scripts from Autoptimize" and "Exclude CSS from Autoptimize".  Due to the nonstandard location of these assets, the plugin is not able to follow the URL aliases to them, so the CakePHP assets cannot be minified.
+* [WP Super Cache](https://wordpress.org/plugins/wp-super-cache/) - On the Advanced Settings, make sure that you add the string `app` to the list of URL strings to leave uncached.
+* [Autoptimize](https://wordpress.org/plugins/autoptimize/) - Add `app` to "Exclude scripts from Autoptimize" and "Exclude CSS from Autoptimize".  Due to the nonstandard location of these assets, the plugin is not able to follow the URL aliases to them, so the CakePHP assets cannot be minified by this plugin.  You could of course minify them separately in the CakePHP app.
 
 
 ## Usage
