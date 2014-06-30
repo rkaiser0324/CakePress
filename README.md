@@ -1,12 +1,12 @@
 CakePress
 =========
 
-CakePress is a Wordpress 3.6+ plugin to integrate a CakePHP 2.3.8 web application into Wordpress.  It is based on the [Jake project](https://github.com/rkaiser0324/jake), which does the same for Joomla.
+CakePress is a Wordpress plugin to integrate a CakePHP web application into Wordpress.  It is based on the [Jake project](https://github.com/rkaiser0324/jake), which does the same for Joomla.
 
-This project contains sample CakePHP and WordPress codebases, as a demonstration.  But all the magic specific to this plugin is contained in the following files:
+This project contains sample CakePHP 2.5.1 and WordPress 3.9.1 codebases, as a demonstration.  But all the magic specific to this plugin is contained in the following files:
 
 * `WordPress/.htaccess`
-* `WordPress/wp-content/plugins/CakePress`
+* `WordPress/wp-content/plugins/CakePress/*`
 * `cakephp/app/webroot/index.php`
 
 
@@ -31,7 +31,7 @@ Alias /webapp "CAKEPHP_ROOT/app/webroot"
 The following optional plugins require additional configuration if they are used:
 
 * WP Super Cache - On the Advanced Settings, make sure that you add the string "app" to the list of URL strings to leave uncached.
-* Autoptimize - Add `app` to "Exclude scripts from Autoptimize" and "Exclude CSS from Autoptimize" as the plugin is not able to follow the URL aliases to the assets.
+* Autoptimize - Add `app` to "Exclude scripts from Autoptimize" and "Exclude CSS from Autoptimize".  Due to the nonstandard location of these assets, the plugin is not able to follow the URL aliases to them.
 
 
 ## Usage
@@ -44,7 +44,7 @@ After configuration, your CakePHP app is available at `http://wordpressserver/ap
         if (defined('JAKE'))  
         {
             // Running inside CakePress
-            $this->set('user', wp_get_current_user());
+            $this->set('wordpress_user', wp_get_current_user());
         }
         else
         {

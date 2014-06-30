@@ -5,27 +5,8 @@ RewriteBase /
 
 # BEGIN CakePress
 
-# We need to handle everything that starts with "app"
-# See http://www.phpbb-seo.com/en/apache-mod-rewrite/article3226.html and http://blog.echothis.com/2009/07/22/search-engine-friendly-urls-using-the-jake-bridge/
-
-# First, rewrite app/webroot
-RewriteRule     ^app\/webroot\/(.*)$     /app/$1                                [QSA,L]
-
-# Then, redirect any static assets to /webapp/* as per http://www.askapache.com/htaccess/setenvif.html
-# Note use of (.+) to make sure that /app/ itself is skipped here
-
-SetEnvIfNoCase  REQUEST_URI "\/app\/(.+)$"  path_to_check=cakephp/app/webroot/$1
-
-# Make sure that path_to_check is not empty
-RewriteCond     %{ENV:path_to_check} ^(.+)$   
-
-RewriteCond     %{DOCUMENT_ROOT}/../%{ENV:path_to_check} -f                     [OR]
-RewriteCond     %{DOCUMENT_ROOT}/../%{ENV:path_to_check} -d 
-RewriteRule     ^app\/(.*)$     /webapp/$1                                      [QSA,L]
-
-# And finally, handle everything remaining as an ordinary Cake action
-RewriteRule	^app$           /index.php?option=com_jake&jrun=/               [QSA,L]
-RewriteRule	^app(.+)$	/index.php?option=com_jake&jrun=$1		[QSA,L]
+# Use the /webapp Alias for serving asset files
+RewriteRule     ^app\/webroot\/(.*)$     /webapp/$1                                [QSA,L]
 
 # End CakePress
 

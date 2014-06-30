@@ -103,6 +103,9 @@ class CakePressPlugin {
         $wp_query->post_count = 1;
         $wp_query->found_posts = 1;
         $wp_query->max_num_pages = 0;
+        
+		// See http://wordpress.stackexchange.com/questions/66331/how-does-one-suppress-a-404-status-code-in-a-wordpress-page
+        status_header(200);
 
         return get_page_template();
     }
@@ -141,4 +144,4 @@ class CakePressPlugin {
 
 }
 
-$cakepress_plugin = new CakePressPlugin();
+new CakePressPlugin();
