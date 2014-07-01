@@ -10,8 +10,8 @@
 
 class CakePressPlugin {
 
-    var $_arr = array();
-    var $_url = '';
+    private $_contents = array();
+    private $_url = '';
 
     function __construct() {
 
@@ -37,15 +37,11 @@ class CakePressPlugin {
         require 'cake_embedded_dispatcher.class.php';
         $cakeDispatcher = new CakeEmbeddedDispatcher();
         $cakeDispatcher->setCakePath(dirname(ABSPATH) . DIRECTORY_SEPARATOR . 'cakephp');
-        $cakeDispatcher->setCakeUrlBase('/app');
-        $cakeDispatcher->setSefCakeApplicationBase('/app');
-        $cakeDispatcher->setComponent('/index.php?option=com_jake&jrun=$CAKE_ACTION');
         $cakeDispatcher->setCleanOutput(false);
-        $cakeDispatcher->setCleanOutputParameter('task', 'clean');
-        $cakeDispatcher->setIgnoreParameters(array('option', 'jrun', 'task', 'url'));
+        $cakeDispatcher->setIgnoreParameters(array('url'));
         $cakeDispatcher->setRestoreSession(true);
 
-        $this->_arr = $cakeDispatcher->get($this->_url);
+        $this->_contents = $cakeDispatcher->get($this->_url);
 
         // Enqueue the CakePHP JS and CSS assets last
         add_action('wp_enqueue_scripts', array($this, 'enqueueCakephpAssets'), 100);
@@ -59,14 +55,14 @@ class CakePressPlugin {
      */
     function enqueueCakephpAssets()
     {
-        if (!empty($this->_arr['head']['stylesheets'])) {
-            for ($i = 0; $i < count($this->_arr['head']['stylesheets']); $i++) {
-                wp_enqueue_style('cake_stylesheet_' . $i, $this->_arr['head']['stylesheets'][$i]['href']);
+        if (!empty($this->_contents['head']['stylesheets'])) {
+            for ($i = 0; $i < count($this->_contents['head']['stylesheets']); $i++) {
+                wp_enqueue_style('cake_stylesheet_' . $i, $this->_contents['head']['stylesheets'][$i]['href']);
             }
         }
-        if (!empty($this->_arr['head']['script'])) {
-            for ($i = 0; $i < count($this->_arr['head']['script']); $i++) {
-                wp_enqueue_script('cake_script_' . $i, $this->_arr['head']['script'][$i]['src']);
+        if (!empty($this->_contents['head']['script'])) {
+            for ($i = 0; $i < count($this->_contents['head']['script']); $i++) {
+                wp_enqueue_script('cake_script_' . $i, $this->_contents['head']['script'][$i]['src']);
             }
         }
     }
@@ -84,9 +80,9 @@ class CakePressPlugin {
         $post->post_category = array('uncategorized');
         $post->post_excerpt = ''; //For all your post excerpt needs.
         $post->post_status = 'publish'; //Set the status of the new post.
-        $post->post_title = $this->_arr['head']['title']; //The title of your post.
+        $post->post_title = $this->_contents['head']['title']; //The title of your post.
         $post->post_type = 'page'; //Sometimes you might want to post a page.
-        $post->post_content = $this->_arr['body'];
+        $post->post_content = $this->_contents['body'];
 
         // Populate the posts array with our 404 page object
         $wp_query->posts = array($post);
@@ -121,7 +117,7 @@ class CakePressPlugin {
      */
     function replacePageContent($content) {
         if (is_singular() && is_main_query()) {
-            $content = $this->_arr['body'];
+            $content = $this->_contents['body'];
         }
         return $content;
     }
@@ -135,7 +131,7 @@ class CakePressPlugin {
      * @return string
      */
     function replacePageHeadTitle($title, $sep, $sep_location) {
-        return $this->_arr['head']['title'];
+        return $this->_contents['head']['title'];
     }
 
 }
