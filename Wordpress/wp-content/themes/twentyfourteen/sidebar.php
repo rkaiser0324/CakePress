@@ -8,7 +8,8 @@
  */
 ?>
 <div id="secondary">
-	<?php
+    blank
+	<?php  /*
 		$description = get_bloginfo( 'description', 'display' );
 		if ( ! empty ( $description ) ) :
 	?>
@@ -25,5 +26,5 @@
 	<div id="primary-sidebar" class="primary-sidebar widget-area" role="complementary">
 		<?php dynamic_sidebar( 'sidebar-1' ); ?>
 	</div><!-- #primary-sidebar -->
-	<?php endif; ?>
+	<?php endif; */ ?>
 </div><!-- #secondary -->
