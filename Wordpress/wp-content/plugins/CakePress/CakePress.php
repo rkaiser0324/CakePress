@@ -73,7 +73,7 @@ class CakePressPlugin {
         global $wp_query, $post;
 
         $post = new stdClass();
-        $post->ID = -1;
+        $post->ID = 99999999;
         $post->post_author = '';
         $post->post_date = '';
         $post->ancestors = array();
@@ -98,7 +98,7 @@ class CakePressPlugin {
         
 	// See http://wordpress.stackexchange.com/questions/66331/how-does-one-suppress-a-404-status-code-in-a-wordpress-page
         status_header(200);
-
+//die(get_page_template());
         return get_page_template();
     }
 
@@ -137,3 +137,13 @@ class CakePressPlugin {
 }
 
 new CakePressPlugin();
+
+add_filter('the_content', 'modify_content');
+function modify_content($content) {
+    global $post;
+    if ($post->ID != -99)
+        return $content;
+
+    $modified_content = 'new page';
+    return $modified_content;
+}

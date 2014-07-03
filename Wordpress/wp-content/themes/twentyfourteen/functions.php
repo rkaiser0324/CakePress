@@ -115,7 +115,7 @@ function twentyfourteen_setup() {
 	add_filter( 'use_default_gallery_style', '__return_false' );
 }
 endif; // twentyfourteen_setup
-//add_action( 'after_setup_theme', 'twentyfourteen_setup' );
+add_action( 'after_setup_theme', 'twentyfourteen_setup' );
 
 /**
  * Adjust content_width value for image attachment template.
@@ -195,7 +195,8 @@ function twentyfourteen_widgets_init() {
 		'after_title'   => '</h1>',
 	) );
 }
-//add_action( 'widgets_init', 'twentyfourteen_widgets_init' );
+// Responsible for 10 queries here
+add_action( 'widgets_init', 'twentyfourteen_widgets_init' );
 
 /**
  * Register Lato Google font for Twenty Fourteen.

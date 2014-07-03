@@ -36,6 +36,7 @@ get_header(); ?>
 						comments_template();
 					}
 				endwhile;
+                                die();
 			?>
 
 		</div><!-- #content -->
