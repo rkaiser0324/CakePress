@@ -17,7 +17,7 @@ class CakePressPlugin {
 
         if (preg_match('/^\/app\//', $_SERVER['REQUEST_URI']))
             $this->_url = str_replace('/app', '', $_SERVER['REQUEST_URI']);
-        elseif ($_SERVER['REQUEST_URI'] == '/app')
+        elseif ($_SERVER['REQUEST_URI'] == '/app' || preg_match('/^\/app\?/', $_SERVER['REQUEST_URI']))
             $this->_url = '/';
 
         if (!empty($this->_url)) {
@@ -55,6 +55,7 @@ class CakePressPlugin {
      */
     function enqueueCakephpAssets()
     {
+        
         if (!empty($this->_contents['head']['stylesheets'])) {
             for ($i = 0; $i < count($this->_contents['head']['stylesheets']); $i++) {
                 wp_enqueue_style('cake_stylesheet_' . $i, $this->_contents['head']['stylesheets'][$i]['href']);
@@ -72,6 +73,7 @@ class CakePressPlugin {
     function custom404Template($template) {
         global $wp_query, $post;
 
+
         $post = new stdClass();
         $post->ID = -1;
         $post->post_author = '';
@@ -83,7 +85,8 @@ class CakePressPlugin {
         $post->post_title = $this->_contents['head']['title']; //The title of your post.
         $post->post_type = 'page'; //Sometimes you might want to post a page.
         $post->post_content = $this->_contents['body'];
-
+        
+        
         // Populate the posts array with our 404 page object
         $wp_query->posts = array($post);
 
@@ -98,28 +101,16 @@ class CakePressPlugin {
         
 	// See http://wordpress.stackexchange.com/questions/66331/how-does-one-suppress-a-404-status-code-in-a-wordpress-page
         status_header(200);
+     
 
         return get_page_template();
     }
 
-    // Simple helper function to aid in debugging
+    // Simple helper function to aid in debugging; similar to CakePHP's debug()
     private function debug($s) {
         echo '<pre style="padding:20px;background-color:yellow;font-size:larger">';
         print_r($s);
         echo "</pre>";
-    }
-
-    /**
-     * Replace the page content. See https://pippinsplugins.com/playing-nice-with-the-content-filter/
-     * 
-     * @param string $content
-     * @return string
-     */
-    function replacePageContent($content) {
-        if (is_singular() && is_main_query()) {
-            $content = $this->_contents['body'];
-        }
-        return $content;
     }
 
     /**
