@@ -13,19 +13,14 @@ It requires Apache 2.2.2, with mod_rewrite enabled.
 ## Configuration
 
 * The repo contains both WordPress and CakePHP codebases in the proper locations.  The CakePHP directory should be named "cakephp" and be a sibling to the WordPress one, i.e., your WORDPRESS_ROOT is `/path/to/www/WordPress` and your CAKEPHP_ROOT is `/path/to/www/cakephp`.
-* Add the following Apache Alias, used for delivering existing files from under `CAKEPHP_ROOT/app/webroot`, to the WordPress VirtualHost. This should point to the `app/webroot` directory of the CakePHP app.
+* Add the following Apache Alias, used for delivering existing files from under `CAKEPHP_ROOT/app/webroot`, to the WordPress VirtualHost. 
 
 ```
 Alias /app/webroot "CAKEPHP_ROOT/app/webroot"
-<Directory "CAKEPHP_ROOT/app/webroot">
-    AllowOverride All
-    Order allow,deny
-    Allow from all
-</Directory>
 ```
 
-* Enable URL rewriting on both your WORDPRESS_ROOT and CAKEPHP_ROOT
-* Bounce Apache
+* Make sure URL rewriting is enabled on your VirtualHost.  If you are installing Wordpress for the first time, it will clobber the contents of `WordPress/.htaccess` so you will need to restore that file afterwards.
+* Bounce Apache.  You should then see 
 
 ### Plugins
 If used, the following WordPress plugins require additional configuration:
@@ -36,7 +31,7 @@ If used, the following WordPress plugins require additional configuration:
 
 ## Usage
 
-After configuration, your CakePHP app is available at `http://wordpressserver/app/`.  You can do stuff like this in your CakePHP controller:
+After configuration, you can access Wordpress at `http://wordpressserver/`, and CakePHP at `http://wordpressserver/app/`.  You can then do stuff like this in your CakePHP controller:
 ```php
 
     function beforeFilter() {

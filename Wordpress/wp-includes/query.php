@@ -3490,6 +3490,8 @@ class WP_Query {
 	 */
 	function the_post() {
 		global $post;
+//                var_dump($post);
+//                die($post->ID);
 		$this->in_the_loop = true;
 
 		if ( $this->current_post == -1 ) // loop has just started

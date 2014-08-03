@@ -40,12 +40,13 @@ if ( ! class_exists( 'Debug_Objects_Wrap' ) ) {
 		 * @return  void
 		 */
 		public function __construct() {
+                    
 			// not enough right - back
-			if ( ! current_user_can( '_debug_objects' ) )
-				return;
-			
+//			if ( ! current_user_can( '_debug_objects' ) )
+//				return;
+////			die('in construct');
 			$options = Debug_Objects_Settings::return_options();
-			
+                        
 			// check for output on frontend
 			if ( isset( $options['frontend'] ) && '1' === $options['frontend']
 				 || self::debug_control()
@@ -53,6 +54,8 @@ if ( ! class_exists( 'Debug_Objects_Wrap' ) ) {
 				add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_styles') );
 				add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts') );
 				add_action( 'wp_footer', array( $this, 'get_content' ), 9999 );
+                                
+                                //die('here');
 			}
 			// check for output on backend
 			if ( isset( $options['backend'] ) && '1' === $options['backend']

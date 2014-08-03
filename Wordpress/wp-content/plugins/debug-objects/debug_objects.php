@@ -22,6 +22,8 @@ if ( ! function_exists( 'add_filter' ) ) {
 	exit;
 }
 
+
+
 if ( ! class_exists( 'Debug_Objects' ) ) {
 	
 	// include plugin on hook
@@ -109,6 +111,8 @@ if ( ! class_exists( 'Debug_Objects' ) ) {
 			// load all files form autoload folder
 			$this->load();
 			
+
+                        
 			// add custom capability
 			add_action( 'admin_init', array( $this, 'add_capabilities' ) );
 			
@@ -141,6 +145,10 @@ if ( ! class_exists( 'Debug_Objects' ) ) {
 		public function add_capabilities() {
 
 			$GLOBALS['wp_roles']->add_cap( 'administrator', '_debug_objects' );
+                        
+//                        var_dump($GLOBALS['wp_roles']);
+//                                                $GLOBALS['wp_roles']->add_cap( 'subscriber', '_debug_objects' );
+                  
 		}
 
 		/**
