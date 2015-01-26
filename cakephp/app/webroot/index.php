@@ -71,7 +71,7 @@ if (defined('JAKE')) {
     }
     $httpHost = $_SERVER['HTTP_HOST'];
     if (isset($httpHost)) {
-        define('FULL_BASE_URL', 'http' . $s . '://' . $httpHost . '/app');
+        define('FULL_BASE_URL', 'http' . $s . '://' . $httpHost);
     }
     unset($httpHost, $s);
 }/**
