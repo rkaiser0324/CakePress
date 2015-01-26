@@ -25,11 +25,9 @@ After you've done the following, bounced your web servers, and set up Wordpress 
 * Add the following directives to the WordPress VirtualHost:
 
 ```
-DocumentRoot /path/to/WordPress
-# List the asset folders used by Cake
-Alias /js "/path/to/www/cakephp/app/webroot/js"
-Alias /css "/path/to/www/cakephp/app/webroot/css"
-Alias /img "/path/to/www/cakephp/app/webroot/img"
+DocumentRoot /path/to/www/WordPress
+# List the standard asset folders used by Cake.  Would need modification if your app uses other paths as well.
+AliasMatch ^/(js|css|img)/(.*)$     /var/www/winecountry/cakephp/app/webroot/$1/$2
 RewriteEngine on                # if needed
 ```
 
@@ -51,11 +49,11 @@ upstream php {
 } 
 server {
         listen   80; 
-        root /path/to/Wordpress;
+        root /path/to/www/Wordpress;
         index index.php index.html index.htm;
         server_name wordpressserver;        # etc.
-        # List the asset folders used by CakePress
-        location ~ ^/(css|js|img)/ {
+        # List the standard asset folders used by Cake.  Would need modification if your app uses other paths as well.
+        location ~ ^/(js|css|img)/ {
             root /path/to/cakephp/app/webroot;
         }
 	# Add URLs that will be managed by CakePress
