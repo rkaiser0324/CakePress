@@ -1,31 +1,9 @@
 <?php
 
 /**
- * Cake Embedded Dispatcher class file.
- *
- * Class that encapsulates the Cake Dispatcher for integration.  Based on the Jake project at https://github.com/rkaiser0324/jake.
- *
- * @filesource
- * @link			http://dev.sypad.com/projects/jake Jake
- * @package		cif
- * @subpackage	dispatcher
- * @since			1.0
- */
-// Definitions
-
-define('CAKEED_REGEX_PATTERN_HEAD', '<head[^>]*>(.*)<\/head>');
-define('CAKEED_REGEX_PATTERN_HEAD_META', '<meta[^>]*\/?>');
-define('CAKEED_REGEX_PATTERN_HEAD_TITLE', '<title[^>]*>(.*)<\/title>');
-define('CAKEED_REGEX_PATTERN_HEAD_SCRIPT', '<script[^>]*src=("|\')([^"\']*)("|\')><\/script>');
-define('CAKEED_REGEX_PATTERN_HEAD_SCRIPT_BODY', '<script[^>]*type=("|\')([^"\']*)("|\')>([^<]*)<\/script>');
-define('CAKEED_REGEX_PATTERN_HEAD_STYLESHEET', '<link[^>]*rel="stylesheet"[^>]*href="([^"]*)"[^>]*?\/?>');
-define('CAKEED_REGEX_PATTERN_HEAD_TAGS', '<([^>]*)>');
-define('CAKEED_REGEX_PATTERN_BODY', '<body[^>]*>(.*)<\/body>');
-
-/**
  * Cake Embedded Dispatcher.
  * 
- * @author		Mariano Iglesias - mariano@cricava.com
+ * @author		Mariano Iglesias - mariano@cricava.com, no maintained at https://github.com/rkaiser0324/CakePress
  * @package		cif
  * @subpackage	dispatcher
  */
@@ -41,30 +19,6 @@ class CakeEmbeddedDispatcher {
      * @var string
      */
     var $cakePath;
-
-    /**
-     * CakePHP's base URL.
-     * 
-     * @since 1.0
-     * @var string
-     */
-    var $cakeUrlBase = '';
-
-    /**
-     * Parameters to add at the end of a transformed CakePHP link.
-     * 
-     * @since 1.0
-     * @var string
-     */
-    var $cakeUrlAddParameters = '';
-
-    /**
-     * URL to component integrating CakePHP.
-     * 
-     * @since 1.0
-     * @var string
-     */
-    var $component = '';
 
     /**
      * Which parameters received via $_GET are not for CakePHP to take
@@ -83,14 +37,6 @@ class CakeEmbeddedDispatcher {
     var $cleanOutput = false;
 
     /**
-     * What to add to the URL to indicate clean output (in the form parameter=value).
-     * 
-     * @since 1.0
-     * @var string
-     */
-    var $cleanOutputParameter = '';
-
-    /**
      * Set to true if session should be closed before running CakePHP, then restored.
      * 
      * @since 1.0
@@ -107,24 +53,21 @@ class CakeEmbeddedDispatcher {
     var $backSession;
 
     /**
-     * Base for SEF URI's
-     *
-     * @since 1.1
-     * @var string
-     */
-    var $sefCakeApplicationBase = null;
-
-    /**
-     * Set base path to CakePHP application, using SEF URL's.
+     * Default content array
      * 
-     * @param string $base	Base path to Cake application in SEF URI
-     * 
-     * @access public
-     * @since 1.1
+     * @var array
      */
-    function setSefCakeApplicationBase($base) {
-        $this->sefCakeApplicationBase = $base;
-    }
+    var $_defaultContentArray = array(
+        'http_status_code' => 200,
+        'head' => array(
+            'meta' => array(),
+            'title' => '',
+            'script' => array(),
+            'stylesheets' => array(),
+            'custom' => array()
+        ),
+        'body' => ''
+    );
 
     /**
      * Set path to CakePHP application.
@@ -136,42 +79,6 @@ class CakeEmbeddedDispatcher {
      */
     function setCakePath($cakePath) {
         $this->cakePath = $cakePath;
-    }
-
-    /**
-     * Set CakePHP application's URL.
-     * 
-     * @param string $cakeUrlBase	CakePHP application's URL
-     * 
-     * @access public
-     * @since 1.0
-     */
-    function setCakeUrlBase($cakeUrlBase) {
-        $this->cakeUrlBase = $cakeUrlBase;
-    }
-
-    /**
-     * Parameters to add to changed URLs.
-     * 
-     * @param string $cakeUrlAddParameters	Valid query string (param1=dummy1&param2=dummy2)
-     * 
-     * @access public
-     * @since 1.0
-     */
-    function setCakeUrlAddParameters($cakeUrlAddParameters) {
-        $this->cakeUrlAddParameters = $cakeUrlAddParameters;
-    }
-
-    /**
-     * Sets the URL to the component so links are maintained within the component.
-     * 
-     * @param string $component	URL to the component (use $CAKE_ACTION where you want the cake action to be referenced).
-     * 
-     * @access public
-     * @since 1.0
-     */
-    function setComponent($component) {
-        $this->component = $component;
     }
 
     /**
@@ -196,19 +103,6 @@ class CakeEmbeddedDispatcher {
      */
     function setCleanOutput($cleanOutput) {
         $this->cleanOutput = $cleanOutput;
-    }
-
-    /**
-     * What to add to the URL to indicate clean output (for AJAX returns)
-     * 
-     * @param string $parameter	Parameter name
-     * @param string $value	Parameter value ('clean' by default)
-     * 
-     * @access public
-     * @since 1.0 
-     */
-    function setCleanOutputParameter($parameter, $value = 'clean') {
-        $this->cleanOutputParameter = $parameter . '=' . urlencode($value);
     }
 
     /**
@@ -238,26 +132,13 @@ class CakeEmbeddedDispatcher {
         $this->_start($_url);
 
         try {
+            // Remove the slashes that get added here: See http://mantis.digipowers.com/view.php?id=1974
+            $_POST = $this->_strip_deep2($_POST);
+            // Enable output buffering
+            ob_start();
+            require_once($this->cakePath . DIRECTORY_SEPARATOR . 'index.php');
+            $html = ob_get_clean();
 
-            // Automatically empty the cache for anything that's not a GET, or has a query string
-            // There may be other URLs that get added to this
-            //        if ($_SERVER['REQUEST_METHOD'] !== 'GET' || !empty($_SERVER['QUERY_STRING']))
-            //           apc_delete($_url);
-
-            $cache_success = false;
-            if (!$cache_success) {
-
-                // Remove the slashes that get added here: See http://mantis.digipowers.com/view.php?id=1974
-                $_POST = $this->_strip_deep2($_POST);
-                // Enable output buffering
-                ob_start();
-                require_once($this->cakePath . DIRECTORY_SEPARATOR . 'index.php');
-                $html = ob_get_clean();
-
-                //   if (!defined('CAKEPRESS_INVALIDATE_URL'))
-                // Cache it for 10 minutes max
-                //      apc_store($_url, $html, 60*10);
-            }
             // Commit any $_SESSION changes
             session_write_close();
 
@@ -277,14 +158,23 @@ class CakeEmbeddedDispatcher {
 
             $result = $this->_finish($html);
         } catch (exception $e) {
-            // Unusual HTTP response codes, such as 404's, will throw exceptions
-            $result = array(
-                'head' => array(),
-                'body' => sprintf("<div style='border:1px solid #999;padding:10px;background:#eee'><p style='color:red;font-weight:bold'>%s</p> 
+            // Unusual HTTP response codes, such as hard 404's, will throw exceptions.  Show the details if we're in WP_DEBUG
+            $result = $this->_defaultContentArray;
+            if (WP_DEBUG) {
+                $result['body'] = sprintf("<div style='border:1px solid #999;padding:10px;background:#eee'><p style='color:red;font-weight:bold'>%s</p> 
                         <p>URL: %s</p> 
                         <p>File: %s:%s</p> 
-                        <pre>%s</pre></div>", $e->getMessage(), $_url, $e->getFile(), $e->getLine(), $e->getTraceAsString())
-            );
+                        <pre>%s</pre></div>", $e->getMessage(), $_url, $e->getFile(), $e->getLine(), $e->getTraceAsString());
+            } else {
+                // http://wordpress.stackexchange.com/questions/73738/how-do-i-programmatically-generate-a-404
+                add_action('wp', function () {
+                    global $wp_query;
+                    $wp_query->set_404();
+                    header("HTTP/1.0 404 Not Found");
+                    // Didn't see this way documented but it seems to do the trick
+                    $wp_query->post_count = 0;
+                });
+            }
         }
         return $result;
     }
@@ -343,7 +233,6 @@ class CakeEmbeddedDispatcher {
         $_GET['url'] = $url;
 
         // Remove unnecessary parameters for CakePHP
-
         if (isset($this->ignoreParameters)) {
             foreach ($this->ignoreParameters as $parameter) {
                 unset($_REQUEST[$parameter]);
@@ -372,105 +261,42 @@ class CakeEmbeddedDispatcher {
      * 
      * @param string $html	
      * 
-     * @return array $contents	Format array('head' => array(), 'body' => string), with modified links and references
+     * @return array $contents	Array formatted as _defaultContentArray, with modified links and references
      */
     private function _finish($html) {
+        $contents = $this->_defaultContentArray;
 
-        $contents = array('head' => array(), 'body' => '');
-
-        // set a reasonable limit - my default limit, 100000, was causing this to fail silently.  Now it errors loudly.
-        $backtrack_limit = ini_get('pcre.backtrack_limit');
-        ini_set('pcre.backtrack_limit', 200000);
-
-        $pcre_errors = array();
+        if (preg_match('@\[cakepress_http_status code="(.+)"\]@msiU', $html, $matches))
+            $contents['http_status_code'] = $matches[1];
 
         if ($this->cleanOutput) {
             $contents['body'] = $html;
         } else {
-            // Get the head
-            $head = array();
+            // Load the DOM_Query class
+            require dirname(__FILE__) . '/lib/DOM-Query/vendor/Loader.php';
+            \Loader::init(array(dirname(__FILE__) . '/lib/DOM-Query/vendor'), false);
 
-            if (preg_match_all('/' . CAKEED_REGEX_PATTERN_HEAD . '/si', $html, $matches, PREG_PATTERN_ORDER) == 1) {
-                $head = $matches[1][0];
-            }
+            $H = new \PowerTools\DOM_Query($html);
 
-            $err = $this->_pcre_error_decode();
-            if ($err != null)
-                $pcre_errors[] = 'Jake error in cake_embedded_dispatcher.class.php (head): ' . $err;
-
-            if (!empty($head)) {
-                // Get elements within head
-
-                $result = $this->_parseHead($head);
-
-                if (!isset($result['custom'])) {
-                    $result['custom'] = array();
-                }
-
-                $contents['head'] = $result;
-            }
+            // Get elements within head
+            $contents['head'] = $this->_parseHead($H);
 
             // Get the body
-
-            if (preg_match_all('/' . CAKEED_REGEX_PATTERN_BODY . '/si', $html, $matches, PREG_PATTERN_ORDER) == 1) {
-                $contents['body'] = $matches[1][0];
-            }
-
-            $err = $this->_pcre_error_decode();
-            if ($err != null)
-                $pcre_errors[] = 'Jake error in cake_embedded_dispatcher.class.php (body): ' . $err;
-
-            if (count($pcre_errors) > 0)
-                $contents['body'] = 'Jake errors:<pre>' . print_r($pcre_errors, true) . "\n\n\nHTML is:\n\n" . htmlspecialchars($html) . '</pre>';
-
-            // reset it back to the original limit
-
-            ini_set('pcre.backtrack_limit', $backtrack_limit);
+            // This avoids mangling HTML by auto-closing <div>s - a big no-no 
+            $body = $H->select('body');
+            $contents['body'] = $body->DOM->saveHTML($body->nodes[0]);
         }
         return $contents;
-    }
-
-    // from http://us.php.net/manual/en/function.preg-last-error.php
-    // returns null if no error, otherwise returns error string
-    private function _pcre_error_decode() {
-        $s = null;
-
-        // get rid of garbage warning on WAMP
-        if (!defined('PREG_BAD_UTF8_OFFSET_ERROR'))
-            define('PREG_BAD_UTF8_OFFSET_ERROR', -99);
-
-        if (function_exists('preg_last_error')) { // only available on PHP 5.2+
-            switch (preg_last_error()) {
-
-                case PREG_INTERNAL_ERROR:
-                    $s = "PREG_INTERNAL_ERROR";
-                    break;
-                case PREG_BACKTRACK_LIMIT_ERROR:
-                    $s = "PREG_BACKTRACK_LIMIT_ERROR";
-                    break;
-                case PREG_RECURSION_LIMIT_ERROR:
-                    $s = "PREG_RECURSION_LIMIT_ERROR";
-                    break;
-                case PREG_BAD_UTF8_ERROR:
-                    $s = "PREG_BAD_UTF8_ERROR";
-                    break;
-                case PREG_BAD_UTF8_OFFSET_ERROR:  // the problem is this is left over from some upstream calculation and I don't see how to get rid of it :(	
-                case PREG_NO_ERROR:
-                default:
-                    break;
-            }
-        }
-        return $s;
     }
 
     /**
      * Parse the HEAD portion of contents and get array of elements, sorted by type (meta, title, script, stylesheets, and custom).
      * 
-     * @param string $head	HEAD contents.
+     * @param \PowerTools\DOM_Query     $H	DOM_Query object
      * 
      * @return array	Associative array of elements by type
      */
-    private function _parseHead(&$head) {
+    private function _parseHead($H) {
         $result = array(
             'meta' => array(),
             'title' => '',
@@ -479,81 +305,65 @@ class CakeEmbeddedDispatcher {
             'custom' => array()
         );
 
-        $backHeadElements = array();
+        $H->select('head > meta')->each(function($index, $el) use (&$result) {
+            $node = $el->nodes[0];
+            $result['meta'][] = $node->ownerDocument->saveXML($node);
+        });
 
-        // Meta tags
-        if (preg_match_all('/' . CAKEED_REGEX_PATTERN_HEAD_META . '/si', $head, $matches, PREG_PATTERN_ORDER) > 0) {
-            for ($i = 0, $limiti = count($matches[0]); $i < $limiti; $i++) {
-                $backHeadElements[] = $matches[0][$i];
+        $H->select('head > title')->each(function($index, $el) use (&$result) {
+            $node = $el->nodes[0];
+            $result['title'] = $node->textContent;
+        });
 
-                $result['meta'][] = $matches[0][$i];
-            }
-        }
-
-        // Document title
-        if (preg_match_all('/' . CAKEED_REGEX_PATTERN_HEAD_TITLE . '/si', $head, $matches, PREG_PATTERN_ORDER) == 1) {
-            $backHeadElements[] = $matches[0][0];
-
-            $result['title'] = $matches[1][0];
-        }
-
-        // Script links (references to JS files)
-        if (preg_match_all('/' . CAKEED_REGEX_PATTERN_HEAD_SCRIPT . '/si', $head, $matches, PREG_PATTERN_ORDER) > 0) {
-            for ($i = 0, $limiti = count($matches[0]); $i < $limiti; $i++) {
-                $backHeadElements[] = $matches[0][$i];
-
+        $H->select('head > script')->each(function($index, $el) use (&$result) {
+            $node = $el->nodes[0];
+            if ($node->hasAttribute('src')) {
                 $result['script'][] = array(
-                    'tag' => $matches[0][$i],
-                    'type' => 'text/javascript',
-                    'src' => $matches[2][$i]
+                    'tag' => $node->ownerDocument->saveXML($node),
+                    'type' => $node->hasAttribute('type') ? $node->getAttribute('type') : 'text/javascript',
+                    'src' => $node->getAttribute('src')
                 );
+            } else {
+                // http://stackoverflow.com/questions/6399924/getting-nodes-text-in-php-dom
+                foreach ($node->childNodes as $child) {
+                    if ($child->nodeType == XML_TEXT_NODE) {
+                        $result['script'][] = array(
+                            'tag' => $node->ownerDocument->saveXML($node),
+                            'type' => $node->hasAttribute('type') ? $node->getAttribute('type') : 'text/javascript',
+                            'body' => $child->textContent
+                        );
+                        break;
+                    }
+                }
             }
-        }
+        });
 
-        // Blocks of scripting code
-        if (preg_match_all('/' . CAKEED_REGEX_PATTERN_HEAD_SCRIPT_BODY . '/si', $head, $matches, PREG_PATTERN_ORDER) > 0) {
-            for ($i = 0, $limiti = count($matches[0]); $i < $limiti; $i++) {
-                $backHeadElements[] = $matches[0][$i];
-
-                $result['script'][] = array(
-                    'tag' => $matches[0][$i],
-                    'type' => $matches[2][$i],
-                    'body' => $matches[4][$i]
-                );
-            }
-        }
-
-        // Stylesheet links (references to CSS files)
-        if (preg_match_all('/' . CAKEED_REGEX_PATTERN_HEAD_STYLESHEET . '/si', $head, $matches, PREG_PATTERN_ORDER) > 0) {
-            for ($i = 0, $limiti = count($matches[0]); $i < $limiti; $i++) {
-                $backHeadElements[] = $matches[0][$i];
-
+        $H->select('head > link')->each(function($index, $el) use (&$result) {
+            $node = $el->nodes[0];
+            if ($node->hasAttribute('rel') && $node->getAttribute('rel') == 'stylesheet' && $node->hasAttribute('href')) {
                 $result['stylesheets'][] = array(
-                    'tag' => $matches[0][$i],
+                    'tag' => $node->ownerDocument->saveXML($node),
                     'rel' => 'stylesheet',
                     'type' => 'text/css',
-                    'href' => $matches[1][$i]
+                    'href' => $node->getAttribute('href')
                 );
+            } else {
+                // Some other tag so add it to the custom array
+                $result['custom'][] = $node->ownerDocument->saveXML($node);
             }
-        }
+        });
 
-        // Remove elements we already parsed
-        foreach ($backHeadElements as $element) {
-            $head = str_replace($element, '', $head);
-        }
+        // Notably, remove() doesn't seem to work, so do it this way instead
+        $H->select('head > *')->each(function($index, $el) use (&$result) {
+            $node = $el->nodes[0];
+            if (!in_array($node->tagName, array('meta', 'title', 'script', 'link')))
+                $result['custom'][] = $node->ownerDocument->saveXML($node);
+        });
 
-        // Get remaining head tags
-        $head = trim($head);
-
-        if (!empty($head) && preg_match_all('/' . CAKEED_REGEX_PATTERN_HEAD_TAGS . '/si', $head, $matches, PREG_PATTERN_ORDER) > 0) {
-            for ($i = 0, $limiti = count($matches[0]); $i < $limiti; $i++) {
-                $tag = '<';
-                $tag .= $matches[1][$i];
-                $tag .= '>';
-
-                $result['custom'][] = $tag;
-            }
-        }
+        // For some reason the ordering gets reversed in the above, so fix it for the ones that matter
+        $result['script'] = array_reverse($result['script']);
+        $result['stylesheets'] = array_reverse($result['stylesheets']);
+        $result['custom'] = array_reverse($result['custom']);
 
         return $result;
     }

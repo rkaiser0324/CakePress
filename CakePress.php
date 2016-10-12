@@ -1,7 +1,8 @@
 <?php
+
 /*
   Plugin Name: CakePress
-  Version: 1.1.3
+  Version: 1.2.0
   Description: Allows WordPress to host a CakePHP web application.
   Author: Rolf Kaiser
   Author URI: https://github.com/rkaiser0324/CakePress
@@ -13,150 +14,147 @@ class CakePressPlugin {
     private $_url = '';
 
     function __construct() {
-        add_action('init', array($this, 'onInit'));
+        $this->_url = $_SERVER['REQUEST_URI'];
+        // Give the theme a chance to set the filters
+        add_action('init', array($this, 'onInit'), 99);
     }
 
     function onInit() {
 
-        if (strstr($_SERVER['QUERY_STRING'], 'pagename=cakepress') != null) {
+        $regex_without_leading_slash = apply_filters('cakepress_url_regex', '');
 
-            $this->_url = $_SERVER['REQUEST_URI'];
+        if (!empty($regex_without_leading_slash)) {
+            add_rewrite_rule($regex_without_leading_slash, 'index.php?pagename=cakepress', 'top');
 
-            if ($this->_checkAcl($this->_url)) {
+            $regex_with_leading_slash = preg_replace('@^(\^(.+))@', '^/$2', $regex_without_leading_slash);
 
-                $this->_checkCacheBlacklist($this->_url);
+            if (preg_match("@$regex_with_leading_slash@", $this->_url)) {
+                if (apply_filters('cakepress_check_acl', true, $this->_url)) {
 
-                // Prevent the redirection back to /cakepress/*
-                remove_filter('template_redirect', 'redirect_canonical');
+                    // Prevent the redirection back to /cakepress/*
+                    remove_filter('template_redirect', 'redirect_canonical');
 
-                add_shortcode('cakepress', array($this, 'onShortcode'));
+                    add_shortcode('cakepress', array($this, 'onShortcode'));
 
-                define('JAKE', 1);
-                require 'cake_embedded_dispatcher.class.php';
-                $cakeDispatcher = new CakeEmbeddedDispatcher();
-                $cakeDispatcher->setCakePath(dirname(ABSPATH) . DIRECTORY_SEPARATOR . 'cakephp');
-                $cakeDispatcher->setCleanOutput(false);
-                $cakeDispatcher->setIgnoreParameters(array('url'));
-                $cakeDispatcher->setRestoreSession(true);
+                    define('JAKE', 1);
+                    require 'cake_embedded_dispatcher.class.php';
+                    $cakeDispatcher = new CakeEmbeddedDispatcher();
+                    $cakeDispatcher->setCakePath(dirname(ABSPATH) . DIRECTORY_SEPARATOR . 'cakephp');
 
-                $original_query_string = $_SERVER['QUERY_STRING'];
-                $_SERVER['QUERY_STRING'] = str_replace('post_type=page&pagename=cakepress', '', $original_query_string);
-                // $_SERVER['REDIRECT_QUERY_STRING'] is set by Apache, but not by nginx/php-fpm
-                $original_redirect_query_string = empty($_SERVER['REDIRECT_QUERY_STRING']) ? '' : $_SERVER['REDIRECT_QUERY_STRING'];
-                $_SERVER['REDIRECT_QUERY_STRING'] = str_replace('post_type=page&pagename=cakepress', '', $original_redirect_query_string);
-                unset($_GET['post_type']);
-                unset($_GET['pagename']);
-                $this->_contents = $cakeDispatcher->get($this->_url);
-                $_SERVER['QUERY_STRING'] = $original_query_string;
-                $_SERVER['REDIRECT_QUERY_STRING'] = $original_redirect_query_string;
-                $_GET['post_type'] = 'page';
-                $_GET['pagename'] = 'cakepress';
+                    define('CAKEPRESS_CLEAN_OUTPUT', apply_filters('cakepress_clean_output', false, $this->_url));
+                    $cakeDispatcher->setCleanOutput(CAKEPRESS_CLEAN_OUTPUT);
+                    $cakeDispatcher->setRestoreSession(true);
 
-                /* If you want to change the template on a per-URI basis, do this:
-                if (preg_match('@^/(uri1|uri2)@', $this->_url)) {
-                    // Change the template; see http://stackoverflow.com/questions/8793304/change-template-in-wordpress-plugin and http://codex.wordpress.org/Plugin_API/Filter_Reference/page_template
+                    $this->_contents = apply_filters('cakepress_filter_contents_array', $cakeDispatcher->get($this->_url), $this->_url);
+
+                    // Set the HTTP status code, such as for soft 404s that were handled by the Cake response
+                    if ($this->_contents['http_status_code'] != 200) {
+                        $http_status_code = $this->_contents['http_status_code'];
+                        add_action('get_header', function() use ($http_status_code) {
+                            status_header($http_status_code);
+                        }, 99);
+                    }
+
+                    // Change the template; see http://stackoverflow.com/questions/8793304/change-template-in-wordpress-plugin 
+                    // and http://codex.wordpress.org/Plugin_API/Filter_Reference/page_template
                     add_filter('page_template', function() {
-                        return get_theme_root() . '/path/to/template.php';
+                        return dirname(__FILE__) . '/cakepress-page-template.php';
                     });
+
+                    // Enqueue the CakePHP JS and CSS assets last
+                    add_action('wp_enqueue_scripts', array($this, 'enqueueCakephpAssets'), 100);
+
+                    // New for WordPress v4.4 - https://developer.wordpress.org/reference/hooks/document_title_parts/
+                    add_filter('document_title_parts', array($this, 'replacePageHeadTitle'), 100);
+
+                    // Enqueue the CakePHP <head> tags last
+                    add_action('wp_head', function() {
+                        // Append the meta and custom tags, as well as any inline Javascript
+                        echo implode("\n", $this->_contents['head']['meta']) . implode("\n", $this->_contents['head']['custom']);
+                        foreach ($this->_contents['head']['script'] as $el)
+                            if (!empty($el['body']))
+                                echo $el['tag'] . "\n";
+                    }, 100);
                 }
-                 */
-
-                // Enqueue the CakePHP JS and CSS assets (assume last)
-                add_action('wp_enqueue_scripts', array($this, 'enqueueCakephpAssets'), 100);
-
-                // Enqueue the CakePHP <head> tags (assume last)
-                add_action('wp_head', function() {
-                    // Remove the wpautop filter, so the Cake content displays as-is.  See http://wordpress.org/support/topic/removing-wpautop-filter
-                    remove_filter('the_content', 'wpautop');
-                    remove_filter('the_excerpt', 'wpautop');
-                    
-                    // Append the meta and custom tags, as well as any inline Javascript
-                    echo implode("\n", $this->_contents['head']['meta']) . implode("\n", $this->_contents['head']['custom']);
-                    foreach ($this->_contents['head']['script'] as $el)
-                        if (!empty($el['body']))
-                            echo $el['tag'] . "\n";
-                }, 100);
+                else {
+                    // Access is not allowed to this URL, so return a 404
+                    add_filter('parse_query', function($query) {
+                        $query->set('pagename', '');
+                        $query->set_404();
+                    }, 1000, 1);
+                }
             }
         }
     }
 
     /**
-     * Verify that that URL isn't on the cache blacklist, and if it is, set the page to not be cached.  This is only needed if you
-     * are using a caching plugin, like Quick Cache.  Other plugins probably use a different constant flag from DONOTCACHEPAGE.
-     * 
-     * Quick Cache, for example, will automatically skip caching for:
-     * 1) URLs with query strings 
-     * 2) responses without "</html>"
-     * 3) reponses in a Wordpress error body tag
-     * 
-     * @param string $url
-     * @return void
-     */
-    private function _checkCacheBlacklist($url) {
-
-        $blacklist = false;
-        // Add logic to check URLs here, e.g.:
-//        if (preg_match('@/controller/action/var1@'))
-//            $blacklist = true;
-
-        if ($blacklist)
-            define('DONOTCACHEPAGE', 1);
-    }
-
-    /**
-     * Verify that this Cake-handled URL doesn't require Editor access.  
-     * If it does, we'll treat it as a 404 by adding the parse_query filter.
-     * 
-     * @param string $url
-     * @return bool $success
-     */
-    private function _checkAcl($url) {
-
-        $success = true;
-        /*
-         * Modify this logic as needed
-         
-        if (!current_user_can('edit_posts')) {
-
-            // Modify this regex as needed
-            if (preg_match('@/(add|edit/|delete/|fragment1|fragment2)@', $url)) {
-                // Recommended here: http://wordpress-hackers.1065353.n5.nabble.com/Throw-404-error-via-plugin-tp12507p12518.html
-                add_filter('parse_query', function($query) {
-                    $query->set('pagename', '');
-                    $query->set_404();
-                }, 1000, 1);
-            }
-        }
-         */
-        return $success;
-    }
-
-    /**
-     * Return the contents of the Cake view.
-     * 
+     * Return the contents of the Cake view.  It may additionally execute any shortcodes contained within.
+     *
      * @return string
      */
     function onShortcode() {
-        return $this->_contents['body'];
+        $html = $this->_contents['body'];
+        if (apply_filters('cakepress_execute_shortcodes', true, $this->_url))
+            $html = do_shortcode($html);
+        return $html;
     }
 
     /**
-     * Enqueue the CakePHP JS and CSS assets.
+     * Enqueue the CakePHP JS and CSS assets.  For JS assets, if the script src matches a script already registered by wp_register_script() then
+     * it is enqueued via that handle, to maintain positioning and dependencies.
      */
     function enqueueCakephpAssets() {
+
+        global $wp_scripts;
 
         if (!empty($this->_contents['head']['stylesheets'])) {
             for ($i = 0; $i < count($this->_contents['head']['stylesheets']); $i++) {
                 wp_enqueue_style('cake_stylesheet_' . $i, $this->_contents['head']['stylesheets'][$i]['href']);
             }
         }
+
+        // For reference, this is the only way to add the "id" attribute to a script; seems like a bug to me.
+        // As per http://wordpress.stackexchange.com/questions/38319/how-to-add-defer-defer-tag-in-plugin-javascripts
+//        add_filter('script_loader_tag', function ( $tag, $handle ) {
+//            if (preg_match('/^cake_/', $handle))
+//                $tag = str_replace(" src", " id='" . $handle . "' src", $tag);
+//
+//            return $tag;
+//        }, 10, 2);
+
+        $domain = (is_ssl() ? 'https://' : 'http://') . $_SERVER['SERVER_NAME'];
         if (!empty($this->_contents['head']['script'])) {
             for ($i = 0; $i < count($this->_contents['head']['script']); $i++) {
-                if (empty($el['body']))
+                $script_handle = null;
+                foreach ($wp_scripts->registered as $registered_script_object) {
+                    if ($registered_script_object->src == $this->_contents['head']['script'][$i]['src'] ||
+                            $registered_script_object->src == $domain . $this->_contents['head']['script'][$i]['src']
+                    ) {
+                        $script_handle = $registered_script_object->handle;
+                        break;
+                    }
+                }
+
+                if (!empty($script_handle))
+                    wp_enqueue_script($script_handle);
+                else
                     wp_enqueue_script('cake_script_' . $i, $this->_contents['head']['script'][$i]['src']);
             }
         }
     }
+
+    /**
+     * Replace the page title used in the <HEAD> tag, called via the document_title_parts filter (replacing wp_title in WordPress 4.4)
+     * https://developer.wordpress.org/reference/hooks/document_title_parts/
+     *
+     * @param array $title
+     * @return array
+     */
+    function replacePageHeadTitle($title) {
+        $title['title'] = $this->_contents['head']['title'];
+        return $title;
+    }
+
 }
 
 new CakePressPlugin();
