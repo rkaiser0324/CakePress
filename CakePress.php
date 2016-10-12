@@ -2,7 +2,7 @@
 
 /*
   Plugin Name: CakePress
-  Version: 1.2.0
+  Version: 2.0.0
   Description: Allows WordPress to host a CakePHP web application.
   Author: Rolf Kaiser
   Author URI: https://github.com/rkaiser0324/CakePress

@@ -1,59 +1,36 @@
 <?php
 
-/**
- * Application level Controller
- *
- * This file is application-wide controller file. You can put all
- * application-wide controller-related methods here.
- *
- * CakePHP(tm) : Rapid Development Framework (http://cakephp.org)
- * Copyright (c) Cake Software Foundation, Inc. (http://cakefoundation.org)
- *
- * Licensed under The MIT License
- * For full copyright and license information, please see the LICENSE.txt
- * Redistributions of files must retain the above copyright notice.
- *
- * @copyright     Copyright (c) Cake Software Foundation, Inc. (http://cakefoundation.org)
- * @link          http://cakephp.org CakePHP(tm) Project
- * @package       app.Controller
- * @since         CakePHP(tm) v 0.2.9
- * @license       http://www.opensource.org/licenses/mit-license.php MIT License
- */
 App::uses('Controller', 'Controller');
 
-/**
- * Application Controller
- *
- * Add your application-wide methods in the class below, your controllers
- * will inherit them.
- *
- * @package		app.Controller
- * @link		http://book.cakephp.org/2.0/en/controllers.html#the-app-controller
- */
 class AppController extends Controller {
 
     public function beforeFilter() {
-
-        // This is slightly misleading for historical reasons.  In this context, an "admin" can access everything, although that 
-        // permission only corresponds to an Editor in Wordpress land.
-        $is_admin = true;
+        $user_has_wordpress_editor_role = true;
         if (defined('JAKE')) {
+            // Running inside the CakePress plugin
+            $this->set('wordpress_user', wp_get_current_user());
+
             $session = $this->Session->read();
             if (!empty($session['Message'])) {
                 define('DONOTCACHEPAGE', 1);
             }
-            $is_admin = current_user_can('edit_posts');
+            $user_has_wordpress_editor_role = current_user_can('edit_posts');
+        } else {
+            // Standalone CakePHP app, not running inside CakePress
         }
-        $this->set('is_admin', $is_admin);
+        $this->set('user_has_wordpress_editor_role', $user_has_wordpress_editor_role);
     }
 
     /**
-     * In the case of a redirect, we exit without returning to Wordpress.  So the Wordpress Quick Cache cannot know not to handle caching the current URL and destination URL.  
+     * If you're using a WordPress page caching plugin (e.g., Quick Cache), you need special handling in the case of a redirect, where you exit without 
+     * returning to Wordpress.  In that case, the plugin cannot know not to handle caching the current URL and destination URL.  
      * So clear the destination, and if the current one should be cleared, clear that as well.
+     *
+     * The following is a sample implementation for Quick Cache.  All this can be ignored if you're not using a page-caching plugin.
      * 
-     * @param type $url
-     * @param type $status
-     * @param type $exit
+     * @param string $url
+     * @param int $status
+     * @param bool $exit
      * @return boolean
      */
     public function beforeRedirect($url, $status = null, $exit = true) {

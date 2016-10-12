@@ -1,0 +1,11 @@
+{
+    "name": "rkaiser0324/CakePress",
+    "type": "library",
+    "description": "Allows WordPress to host a CakePHP web application",
+    "config": {
+        "preferred-install": "source"
+    },
+    "require": {
+        "composer/installers": "~1.0"
+    }
+}
