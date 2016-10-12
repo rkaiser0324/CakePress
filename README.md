@@ -1,7 +1,7 @@
 CakePress
 =========
 
-CakePress is a WordPress plugin to integrate a CakePHP web application into Wordpress.  It is based on the [Jake project](https://github.com/rkaiser0324/jake), which does the same for Joomla.  It can run under any of the following:
+CakePress is a WordPress plugin to integrate a CakePHP 2.x web application into Wordpress.  It is based on the [Jake project](https://github.com/rkaiser0324/jake), which does the same for Joomla.  It can run under any of the following architectures:
 
 * Apache 2.2 or 2.4 with mod_php and mod_rewrite enabled
 * The above, with nginx as a reverse-proxy
@@ -10,15 +10,24 @@ CakePress is a WordPress plugin to integrate a CakePHP web application into Word
 This project contains sample CakePHP 2.5.2 and WordPress 3.9.1 codebases, as a demonstration.  But all the magic is contained in the following files:
 
 * `WordPress/wp-content/plugins/CakePress/*` - plugin files
-* `WordPress/.htaccess` - add a rewrite rule to handle app-specific URLs
 * `cakephp/app/webroot/index.php` - conditionally setting variables to support executing the CakePHP app from the plugin
 * `cakephp/app/Controller/AppController.php` - (Optional) handle authentication and caching integration between WordPress and CakePHP
 
 ## Configuration
 
-* The repo contains both WordPress and CakePHP codebases in the proper locations.  The CakePHP directory should be named "cakephp" and be a sibling to the WordPress one, i.e., if WordPress is at `/path/to/www/Wordpress` then CakePHP is at `/path/to/www/cakephp`.  
+* The repo contains both WordPress and CakePHP codebases in the proper locations.  The CakePHP directory should be named `cakephp` and be a sibling to the WordPress one, i.e., if WordPress is at `/path/to/www/Wordpress` then CakePHP is at `/path/to/www/cakephp`.  
 
-After you've done the following, bounced your web servers, and set up Wordpress (if needed) at `http://wordpressserver/`, log into the WordPress dashboard and enable permalinks (anything other than the default should work).
+After you've done the following, bounced your web servers, and set up Wordpress (if needed) at `http://wordpressserver/`,
+1.  Log into the WordPress dashboard and enable permalinks (anything other than the default should work).
+2.  Create a page at `/cakepress` with the contents of the shortcode `[cakepress]`.
+
+The following filters are available to your theme:
+* cakepress_url_regex - required
+* cakepress_check_acl - default true
+* cakepress_clean_output - default true
+* cakepress_execute_shortcodes - default trye
+* cakepress_filter_contents_array
+
 
 ### Apache with mod_php
 
@@ -29,13 +38,6 @@ DocumentRoot /path/to/www/WordPress
 # List the standard asset folders used by Cake.  Would need modification if your app uses other paths as well.
 AliasMatch ^/(js|css|img)/(.*)$     /var/www/winecountry/cakephp/app/webroot/$1/$2
 RewriteEngine on                # if needed
-```
-
-* Add the following rewrite rule to `/Wordpress/.htaccess`, modifying as needed for your app:
-
-```
-# Add URLs that will be managed by CakePress
-RewriteRule ^(controller1|controller2|controller3)              index.php?post_type=page&pagename=cakepress [L]
 ```
 
 ### nginx with PHP-FPM
@@ -74,7 +76,7 @@ server {
 }
 ```
 
-### WordPress Plugins
+### 3rd-Party WordPress Plugins
 
 If used, the following WordPress plugins require additional configuration:
 
