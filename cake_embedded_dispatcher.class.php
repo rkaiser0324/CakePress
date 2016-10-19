@@ -155,7 +155,7 @@ class CakeEmbeddedDispatcher {
                     $_SESSION[$parameter] = $value;
                 }
             }
-
+            
             $result = $this->_finish($html);
         } catch (exception $e) {
             // Unusual HTTP response codes, such as hard 404's, will throw exceptions.  Show the details if we're in WP_DEBUG
@@ -216,21 +216,7 @@ class CakeEmbeddedDispatcher {
                     $_REQUEST[$name] = $value;
                 }
             }
-
-            $url = str_replace('?' . $parts['query'], '', $url);
         }
-
-        // CakePHP doesn't receive starting slash
-
-        if (empty($url))
-            $url = '/';
-        if ($url[0] == '/') {
-            $url = substr($url, 1);
-        }
-
-        // Let CakePHP pick up the URL
-
-        $_GET['url'] = $url;
 
         // Remove unnecessary parameters for CakePHP
         if (isset($this->ignoreParameters)) {
