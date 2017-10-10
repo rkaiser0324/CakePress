@@ -9,7 +9,7 @@ CakePress is a WordPress plugin to integrate a CakePHP 2.x web application into 
 
 ## Configuration
 
-1.  The CakePHP directory should be named `cakephp` and be a sibling to the WordPress one, i.e., if WordPress is at `/path/to/www/Wordpress` then CakePHP is at `/path/to/www/cakephp`.  Then, set up your webserver(s) as follows (assumes the WordPress server lives at `http://wordpressserver`):
+1.  By default, the CakePHP directory should be named `cakephp` is typically a sibling to the WordPress one, i.e., if WordPress is at `/path/to/www/Wordpress` then CakePHP is at `/path/to/www/cakephp`.  If you're using the [Bedrock](https://roots.io/bedrock/) framework, then it can be a sibling to `/web`.  Then, set up your webserver(s) as follows (assumes the WordPress server lives at `http://wordpressserver`):
 
 
 ### Apache with mod_php
@@ -64,7 +64,7 @@ server {
 2.  Login into your WordPress dashboard at `http://wordpressserver/wp-admin`
 3.  Create a page at `/cakepress` with the page contents of `[cakepress]`
 4.  Go to Settings->Permalinks and enable permalinks 
-5.  In your theme `functions.php` set the `cakepress_url_regex` filter (see below) so the CakePress plugin knows which URLs to handle
+5.  In your theme `functions.php` set the filters below so the CakePress plugin knows which URLs to handle
 6.  In your CakePHP application, overwrite the contents of `app/webroot/index.php` with the `cakephp/app/webroot/index.php` found in this plugin.
 
 ### Third-Party Plugins
@@ -97,6 +97,15 @@ A number of filters are available to control the CakePress behavior.
 add_filter('cakepress_url_regex', function($regex_excluding_initial_slash) {
     // This must return a nonempty string for CakePress to function.
     return "^(controller1|controller2)";
+}, 10, 1);
+/**
+* Set the path to the CakePHP directory, excluding trailing slash.  
+*     
+* @param string $path           Default to be a sibling of the WordPress directory, i.e., ABSPATH
+* @return string $path
+*/
+add_filter('cakepress_cakephp_path', function($path) {
+    return $path;
 }, 10, 1);
 /**
 * Set whether access is allowed to the current URL.  For example you may wish to limit access to certain CakePress URLs, based on the WordPress user role.

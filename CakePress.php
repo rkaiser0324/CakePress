@@ -39,8 +39,7 @@ class CakePressPlugin {
                     define('JAKE', 1);
                     require 'cake_embedded_dispatcher.class.php';
                     $cakeDispatcher = new CakeEmbeddedDispatcher();
-                    $cakeDispatcher->setCakePath(dirname(ABSPATH) . DIRECTORY_SEPARATOR . 'cakephp');
-
+                    $cakeDispatcher->setCakePath(apply_filters('cakepress_cakephp_path', dirname(ABSPATH) . DIRECTORY_SEPARATOR . 'cakephp'));
                     define('CAKEPRESS_CLEAN_OUTPUT', apply_filters('cakepress_clean_output', false, $this->_url));
                     $cakeDispatcher->setCleanOutput(CAKEPRESS_CLEAN_OUTPUT);
                     $cakeDispatcher->setRestoreSession(true);
@@ -54,6 +53,11 @@ class CakePressPlugin {
                             status_header($http_status_code);
                         }, 99);
                     }
+
+                    add_action('parse_request', function($extra_query_vars) {
+                        $extra_query_vars->query_vars[ 'pagename' ] = 'cakepress';
+                        return $extra_query_vars;
+                    }, 99);
 
                     // Change the template; see http://stackoverflow.com/questions/8793304/change-template-in-wordpress-plugin 
                     // and http://codex.wordpress.org/Plugin_API/Filter_Reference/page_template
