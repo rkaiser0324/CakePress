@@ -17,11 +17,12 @@ CakePress is a WordPress plugin to integrate a CakePHP 2.x web application into 
 Add the following directives to the WordPress VirtualHost:
 
 ```
-ServerName                          wordpressserver
-DocumentRoot                        /path/to/www/WordPress
-# List the standard asset folders used by Cake.  Would need modification if your app uses other paths as well.
-AliasMatch                          ^/(js|css|img)/(.*)$     /path/to/www/cakephp/app/webroot/$1/$2
-RewriteEngine on                    # if not otherwise set
+ServerName	wordpressserver
+DocumentRoot	/path/to/www/WordPress
+# List the standard asset folders used by CakePHP.  Would need modification if your app uses other paths as well.
+AliasMatch	^/(wp/)?(js|css|img)/(.*)$	/path/to/www/cakephp/app/webroot/$2/$3
+# And, if not otherwise set
+RewriteEngine 	on
 ```
 
 ### nginx with PHP-FPM
