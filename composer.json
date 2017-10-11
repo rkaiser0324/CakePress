@@ -1,11 +1,19 @@
 {
     "name": "rkaiser0324/CakePress",
-    "type": "library",
+    "type": "wordpress-plugin",
     "description": "Allows WordPress to host a CakePHP web application",
     "config": {
         "preferred-install": "source"
     },
+    "minimum-stability": "dev",
+    "repositories": [
+        {
+            "url": "https://github.com/rkaiser0324/dom-query.git",
+            "type": "git"
+        }
+    ],
     "require": {
-        "composer/installers": "~1.0"
+        "composer/installers": "1.*",
+        "rkaiser0324/dom-query": "dev-master"
     }
 }

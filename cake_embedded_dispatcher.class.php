@@ -155,7 +155,7 @@ class CakeEmbeddedDispatcher {
                     $_SESSION[$parameter] = $value;
                 }
             }
-            
+
             $result = $this->_finish($html);
         } catch (exception $e) {
             // Unusual HTTP response codes, such as hard 404's, will throw exceptions.  Show the details if we're in WP_DEBUG
@@ -258,9 +258,10 @@ class CakeEmbeddedDispatcher {
         if ($this->cleanOutput) {
             $contents['body'] = $html;
         } else {
-            // Load the DOM_Query class
-            require dirname(__FILE__) . '/lib/DOM-Query/vendor/Loader.php';
-            \Loader::init(array(dirname(__FILE__) . '/lib/DOM-Query/vendor'), false);
+            // Load the DOM_Query class.  Sadly the composer autoloader doesn't work here.
+            $loader_path = dirname(__FILE__) . '/vendor/rkaiser0324/dom-query/PowerTools/DOM-Query/vendor/Loader.php';
+            require $loader_path;
+            \Loader::init(array(dirname($loader_path)), false);
 
             $H = new \PowerTools\DOM_Query($html);
 
