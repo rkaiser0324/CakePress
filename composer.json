@@ -8,7 +8,7 @@
     "minimum-stability": "dev",
     "repositories": [
         {
-            "url": "https://github.com/rkaiser0324/dom-query.git",
+            "url": "https://github.com/rkaiser0324/dom-query",
             "type": "git"
         }
     ],
