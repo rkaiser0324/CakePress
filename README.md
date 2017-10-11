@@ -1,7 +1,7 @@
 CakePress
 =========
 
-CakePress is a WordPress plugin to integrate a CakePHP 2.x web application into Wordpress (tested up to 4.6.1), either single-site or multisite.  It was originally based on the [Jake project](https://github.com/rkaiser0324/jake), which was a similar integration into Joomla.  It has been tested under the following architectures:
+CakePress is a WordPress plugin to integrate a CakePHP 2.x web application into Wordpress (tested up to v4.8.2), either single-site or multisite.  It was originally based on the [Jake project](https://github.com/rkaiser0324/jake), which was a similar integration into Joomla.  It has been tested under the following architectures:
 
 * Apache 2.2 or 2.4 with mod_php and mod_rewrite enabled
 * The above, with nginx 1.6.2 as a reverse-proxy
