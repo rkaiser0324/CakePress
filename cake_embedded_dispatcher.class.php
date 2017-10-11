@@ -258,8 +258,11 @@ class CakeEmbeddedDispatcher {
         if ($this->cleanOutput) {
             $contents['body'] = $html;
         } else {
-            // Load the DOM_Query class.  Sadly the composer autoloader doesn't work here.
+            // Load the DOM_Query class, located in one of these locations (for either standard and Bedrock layouts).  
+            // Sadly the composer autoloader doesn't work here.
             $loader_path = dirname(__FILE__) . '/vendor/rkaiser0324/dom-query/PowerTools/DOM-Query/vendor/Loader.php';
+            if (!file_exists($loader_path))
+                $loader_path = ABSPATH . '/../../vendor/rkaiser0324/dom-query/PowerTools/DOM-Query/vendor/Loader.php';
             require $loader_path;
             \Loader::init(array(dirname($loader_path)), false);
 

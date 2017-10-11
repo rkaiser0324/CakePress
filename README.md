@@ -1,16 +1,39 @@
 CakePress
 =========
 
-CakePress is a WordPress plugin to integrate a CakePHP 2.x web application into Wordpress (tested up to v4.8.2), either single-site or multisite.  It was originally based on the [Jake project](https://github.com/rkaiser0324/jake), which was a similar integration into Joomla.  It has been tested under the following architectures:
+CakePress is a WordPress plugin to integrate a CakePHP web application into Wordpress, either single-site or multisite.  It was originally based on the [Jake project](https://github.com/rkaiser0324/jake), which was a similar integration into Joomla.  It has been tested under the following architectures:
 
 * Apache 2.2 or 2.4 with mod_php and mod_rewrite enabled
 * The above, with nginx 1.6.2 as a reverse-proxy
 * nginx 1.6.2 with PHP-FPM
+* WordPress 4.8.2
+* CakePHP 2.9.1
+
+
+## Installation
+
+### Standard WordPress layout
+
+By default, the CakePHP directory should be named `cakephp` and is typically a sibling to the WordPress one, i.e., if WordPress is at `/path/to/www/Wordpress` then CakePHP is at `/path/to/www/cakephp`.  
+
+Then install the dependencies via `composer install` in the plugin directory.
+
+### Bedrock layout
+
+If you're using the [Bedrock](https://roots.io/bedrock/) framework, the CakePHP directory should be a sibling to `/web`.  
+
+Use Composer to install the plugin and dependencies. You'll need to add the following repository to your `composer.json`:
+
+```
+        {
+            "url": "https://github.com/rkaiser0324/dom-query",
+            "type": "git"
+        }      
+```
 
 ## Configuration
 
-1.  By default, the CakePHP directory should be named `cakephp` is typically a sibling to the WordPress one, i.e., if WordPress is at `/path/to/www/Wordpress` then CakePHP is at `/path/to/www/cakephp`.  If you're using the [Bedrock](https://roots.io/bedrock/) framework, then it can be a sibling to `/web`.  Then, set up your webserver(s) as follows (assumes the WordPress server lives at `http://wordpressserver`):
-
+Then, set up your webserver(s) as follows (assumes the WordPress server lives at `http://wordpressserver`):
 
 ### Apache with mod_php
 
