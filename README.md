@@ -31,9 +31,10 @@ Use Composer to install the plugin and dependencies. You'll need to add the foll
         }      
 ```
 
-## Configuration
 
-Then, set up your webserver(s) as follows (assumes the WordPress server lives at `http://wordpressserver`):
+## Server Configuration
+
+Set up your webserver(s) as follows (assumes the WordPress server lives at `http://wordpressserver`):
 
 ### Apache with mod_php
 
@@ -85,13 +86,16 @@ server {
 }
 ```
 
-2.  Login into your WordPress dashboard at `http://wordpressserver/wp-admin`
-3.  Create a page at `/cakepress` with the page contents of `[cakepress]`
-4.  Go to Settings->Permalinks and enable permalinks 
-5.  In your theme `functions.php` set the filters below so the CakePress plugin knows which URLs to handle
-6.  In your CakePHP application, overwrite the contents of `app/webroot/index.php` with the `cakephp/app/webroot/index.php` found in this plugin.
 
-### Third-Party Plugins
+## WordPress and CakePHP Configuration
+
+1.  Login into your WordPress dashboard at `http://wordpressserver/wp-admin`
+2.  Create a page at `/cakepress` with the page contents of `[cakepress]`
+3.  Go to Settings->Permalinks and enable permalinks 
+4.  In your theme `functions.php` set the filters below so the CakePress plugin knows which URLs to handle
+5.  In your CakePHP application, simply overwrite the contents of `cakephp/app/webroot/index.php` with the file found in this plugin
+
+### Third-Party WordPress Plugins
 
 Asset minification presents a problem due to the nonstandard location of Javascript and CSS assets served by the CakePHP app (i.e., the aliased location in the URL doesn't match the typical file path under the WordPress webroot).  If you use a asset minification plugin like [Autoptimize](https://wordpress.org/plugins/autoptimize/) or [BWP Minify](https://github.com/OddOneOut/bwp-minify), you will need to either:
 * Exclude these assets from minification via the plugin configuration, or
@@ -104,7 +108,7 @@ If you use a WordPress page caching plugin like [WP Super Cache](https://wordpre
 
 ### CakePHP
 
-See `cakephp/app/Controller/AppController.php` for sample code showing how user authentication from WordPress to Cake can be handled, as well as integration with page-caching plugins like Quick Cache, if you are using those.
+See `cakephp/app/Controller/AppController.php` for sample code showing how user authentication from WordPress to CakePHP can be handled, as well as integration with page-caching plugins like Quick Cache, if you are using those.
 
 ### WordPress
 
