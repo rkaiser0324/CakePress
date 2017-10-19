@@ -3,11 +3,10 @@ CakePress
 
 CakePress is a WordPress plugin to integrate a CakePHP web application into Wordpress, either single-site or multisite.  It was originally based on the [Jake project](https://github.com/rkaiser0324/jake), which was a similar integration into Joomla.  It has been tested under the following architectures:
 
-* Apache 2.2 or 2.4 with mod_php and mod_rewrite enabled
-* The above, with nginx 1.6.2 as a reverse-proxy
+* Apache 2.2 or 2.4 with mod_php and mod_rewrite enabled, optionally with nginx 1.6.2 as a reverse-proxy
 * nginx 1.6.2 with PHP-FPM
-* WordPress 4.8.2
-* CakePHP 2.9.1
+
+It is known to work with WordPress 4.8.2 and CakePHP 2.9.1.
 
 
 ## Installation
@@ -34,7 +33,7 @@ Use Composer to install the plugin and dependencies. You'll need to add the foll
 
 ## Server Configuration
 
-Set up your webserver(s) as follows (assumes the WordPress server lives at `http://wordpressserver`):
+The following assumes the WordPress installation lives at `http://wordpressserver`:
 
 ### Apache with mod_php
 
@@ -93,7 +92,7 @@ server {
 2.  Create a page at `/cakepress` with the page contents of `[cakepress]`
 3.  Go to Settings->Permalinks and enable permalinks 
 4.  In your theme `functions.php` set the filters below so the CakePress plugin knows which URLs to handle
-5.  In your CakePHP application, simply overwrite the contents of `cakephp/app/webroot/index.php` with the file found in this plugin
+5.  Overwrite the contents of `cakephp/app/webroot/index.php` with the file found in this plugin
 
 ### Third-Party WordPress Plugins
 
@@ -116,34 +115,38 @@ A number of filters are available to control the CakePress behavior.
 
 ```php
 /**
-* Set the URL pattern for CakePress to handle, excluding initial slash.  See add_rewrite_rule() at https://codex.wordpress.org/Rewrite_API/add_rewrite_rule
-* for examples.  After changing this you must flush the rewrite rules, e.g., by navigating to Settings->Permalinks.  This must be set for CakePress to function.
+* Set the URL pattern for CakePress to handle, excluding initial slash.  See add_rewrite_rule() at 
+* https://codex.wordpress.org/Rewrite_API/add_rewrite_rule for examples.  After changing this you 
+* must flush the rewrite rules, e.g., by navigating to Settings->Permalinks.  This must be set for 
+* CakePress to function.
 *     
-* @param string $regex_excluding_initial_slash           URL pattern to match, default '' 
-* @return string $regex_excluding_initial_slash 
+* @param string $regex_excluding_initial_slash           Default '' 
+* @return string 
 */
 add_filter('cakepress_url_regex', function($regex_excluding_initial_slash) {
     // This must return a nonempty string for CakePress to function.
-    return "^(controller1|controller2)";
+    // $regex_excluding_initial_slash = "^(controller1|controller2)";
+    return $regex_excluding_initial_slash;
 }, 10, 1);
 /**
 * Set the path to the CakePHP directory, excluding trailing slash.  
 *     
 * @param string $path           Default to be a sibling of the WordPress directory, i.e., ABSPATH
-* @return string $path
+* @return string
 */
 add_filter('cakepress_cakephp_path', function($path) {
     return $path;
 }, 10, 1);
 /**
-* Set whether access is allowed to the current URL.  For example you may wish to limit access to certain CakePress URLs, based on the WordPress user role.
+* Set whether access is allowed to the current URL.  For example you may wish to limit access to 
+* certain CakePress URLs, based on the WordPress user role.
 *
-* @param bool $is_allowed           Whether access is allowed to the URL, default true
+* @param bool $is_allowed                   Default true
 * @param string $url  
 * @return bool $is_allowed         
 */
 add_filter('cakepress_check_acl', function($is_allowed, $url) {
-    // You can do something like the following
+    // This would limit access to /controller1/adminaction to WordPress Editors only
     // if (!current_user_can('edit_posts')) {
     //    if (preg_match('@/controller1/adminaction)@', $url)) {
     //        $is_allowed = false;
@@ -153,10 +156,11 @@ add_filter('cakepress_check_acl', function($is_allowed, $url) {
 }, 10, 2);
 /**
 * Set whether the output should be rendered "clean", i.e., without the WordPress theme header and footer.
+* This would be done for AJAX responses, for example.
 *
-* @param bool $is_clean           Whether the output should be rendered "clean", default false
+* @param bool $is_clean                     Default false
 * @param string $url   
-* @return bool $is_clean          
+* @return bool          
 */
 add_filter('cakepress_clean_output', function($is_clean, $url) {
    // if (preg_match('@layout=ajax@', $url))
@@ -166,9 +170,9 @@ add_filter('cakepress_clean_output', function($is_clean, $url) {
 /**
 * Set whether shortcodes in the Cake body should be executed.
 *
-* @param bool $execute_shortcodes           Whether shortcodes in the Cake body should be executed, default true.
+* @param bool $execute_shortcodes           Default true
 * @param string $url   
-* @return bool $execute_shortcodes          
+* @return bool        
 */
 add_filter('cakepress_execute_shortcodes', function($execute_shortcodes, $url) {
    // Do not execute shortcodes on these pages
@@ -177,14 +181,16 @@ add_filter('cakepress_execute_shortcodes', function($execute_shortcodes, $url) {
    return $execute_shortcodes;
 }, 10, 2);
 /**
-* Modify the parsed data returned from the CakePHP application for the URL, e.g., the <body> string or HTTP response code.  
+* Modify the parsed data returned from the CakePHP application for the URL, e.g., the <body> string or 
+* HTTP response code.  
 *
-* @param array $contents           CakePress contents array 
+* @param array $contents           
 * @param string $url  
-* @return array $contents        
+* @return array        
 */
 add_filter('cakepress_filter_contents_array', function($contents, $url) {
-   // See CakeEmbeddedDispatcher->$_defaultContentArray for format
+   // See CakeEmbeddedDispatcher->$_defaultContentArray for the format of $contents
+   // $contents['body'] .= '<p>This is appended to the body HTML</p>';
    return $contents;
 }, 10, 2);
 ```

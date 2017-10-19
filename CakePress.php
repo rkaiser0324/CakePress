@@ -2,10 +2,11 @@
 
 /*
   Plugin Name: CakePress
-  Version: 2.0.0
+  Plugin URI: https://github.com/rkaiser0324/CakePress
+  Version: 2.1.1
   Description: Allows WordPress to host a CakePHP web application.
   Author: Rolf Kaiser
-  Author URI: https://github.com/rkaiser0324/CakePress
+  Author URI: http://blog.echothis.com
  */
 
 class CakePressPlugin {
@@ -55,7 +56,7 @@ class CakePressPlugin {
                     }
 
                     add_action('parse_request', function($extra_query_vars) {
-                        $extra_query_vars->query_vars[ 'pagename' ] = 'cakepress';
+                        $extra_query_vars->query_vars['pagename'] = 'cakepress';
                         return $extra_query_vars;
                     }, 99);
 
