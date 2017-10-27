@@ -142,20 +142,6 @@ class CakeEmbeddedDispatcher {
             // Commit any $_SESSION changes
             session_write_close();
 
-            // Restore session.  Not sure if this does anything anymore
-            if ($this->restoreSession && isset($this->backSession) && isset($this->backSession['data'])) {
-                if (isset($_SESSION))
-                    session_destroy();
-
-                session_module_name($this->backSession['module']);
-                session_id($this->backSession['id']);
-                session_start();
-
-                foreach ($this->backSession['data'] as $parameter => $value) {
-                    $_SESSION[$parameter] = $value;
-                }
-            }
-
             $result = $this->_finish($html);
         } catch (exception $e) {
             // Unusual HTTP response codes, such as hard 404's, will throw exceptions.  Show the details if we're in WP_DEBUG

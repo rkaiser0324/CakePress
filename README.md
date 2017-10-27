@@ -42,7 +42,8 @@ Add the following directives to the WordPress VirtualHost:
 ```
 ServerName	wordpressserver
 DocumentRoot	/path/to/www/WordPress
-# List the standard asset folders used by CakePHP.  Would need modification if your app uses other paths as well.
+# List the standard asset folders used by CakePHP.  
+# Would need modification if your app uses other paths as well.
 AliasMatch	^/(wp/)?(js|css|img)/(.*)$	/path/to/www/cakephp/app/webroot/$2/$3
 # And, if not otherwise set
 RewriteEngine 	on
@@ -63,7 +64,8 @@ server {
         root /path/to/www/Wordpress;
         index index.php index.html index.htm;
         server_name wordpressserver;        
-        # List the standard asset folders used by Cake.  Would need modification if your app uses other paths as well.
+        # List the standard asset folders used by Cake.  
+        # Would need modification if your app uses other paths as well.
         location ~ ^/(js|css|img)/ {
             root /path/to/www/cakephp/app/webroot;
         }
