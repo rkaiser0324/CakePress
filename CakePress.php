@@ -3,7 +3,7 @@
 /*
   Plugin Name: CakePress
   Plugin URI: https://github.com/rkaiser0324/CakePress
-  Version: 2.1.1
+  Version: 2.1.2
   Description: Allows WordPress to host a CakePHP web application.
   Author: Rolf Kaiser
   Author URI: http://blog.echothis.com
@@ -68,6 +68,8 @@ class CakePressPlugin {
 
                     // Enqueue the CakePHP JS and CSS assets last
                     add_action('wp_enqueue_scripts', array($this, 'enqueueCakephpAssets'), 100);
+
+                    add_filter('wp_title', array($this, 'replacePageHeadTitleLegacy'), 9, 2);
 
                     // New for WordPress v4.4 - https://developer.wordpress.org/reference/hooks/document_title_parts/
                     add_filter('document_title_parts', array($this, 'replacePageHeadTitle'), 100);
@@ -157,6 +159,18 @@ class CakePressPlugin {
      */
     function replacePageHeadTitle($title) {
         $title['title'] = $this->_contents['head']['title'];
+        return $title;
+    }
+
+    /**
+     * Replace the page title used in the <HEAD> tag.  Only used by the deprecated wp_title filter.
+     *
+     * @param string $title
+     * @param string $sep
+     * @return string
+     */
+    function replacePageHeadTitleLegacy($title, $sep) {
+        $title = preg_replace('@^CakePress@', $this->_contents['head']['title'], $title);
         return $title;
     }
 
