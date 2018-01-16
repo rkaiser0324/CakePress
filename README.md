@@ -141,9 +141,11 @@ add_filter('cakepress_cakephp_path', function($path) {
 }, 10, 1);
 /**
 * Set whether access is allowed to the current URL.  For example you may wish to limit access to 
-* certain CakePress URLs, based on the WordPress user role.
+* certain CakePress URLs, based on the WordPress user role.  By default, any URL not containing 
+* the string "wc-ajax=get_refreshed_fragments" is allowed; this is put in place to avoid unintended
+* behavior if WooCommerce is installed.
 *
-* @param bool $is_allowed                   Default true
+* @param bool $is_allowed     Default true, unless the URL contains "wc-ajax=get_refreshed_fragments"
 * @param string $url  
 * @return bool $is_allowed         
 */

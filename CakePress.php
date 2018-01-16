@@ -30,7 +30,7 @@ class CakePressPlugin {
             $regex_with_leading_slash = preg_replace('@^(\^(.+))@', '^/$2', $regex_without_leading_slash);
 
             if (preg_match("@$regex_with_leading_slash@", $this->_url)) {
-                if (apply_filters('cakepress_check_acl', true, $this->_url)) {
+                if ($this->_checkAcl($this->_url)) {
 
                     // Prevent the redirection back to /cakepress/*
                     remove_filter('template_redirect', 'redirect_canonical');
@@ -92,6 +92,18 @@ class CakePressPlugin {
                 }
             }
         }
+    }
+
+    /**
+     * Check the ACL - by default, it is disallowed if it contains "wc-ajax=get_refreshed_fragments".
+     *
+     * @param string $url
+     * 
+     * @return string
+     */
+    private function _checkAcl($url) {
+        $is_allowed = !preg_match('@wc-ajax=get_refreshed_fragments@', $url);
+        return apply_filters('cakepress_check_acl', $is_allowed, $url);
     }
 
     /**
