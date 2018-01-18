@@ -127,6 +127,7 @@ A number of filters are available to control the CakePress behavior.
 add_filter('cakepress_dom_query_loader_path', function($path) {
     return $path;
 }, 10, 1);
+
 /**
 * Set the URL pattern for CakePress to handle, excluding initial slash.  See add_rewrite_rule() at 
 * https://codex.wordpress.org/Rewrite_API/add_rewrite_rule for examples.  After changing this you 
@@ -141,6 +142,7 @@ add_filter('cakepress_url_regex', function($regex_excluding_initial_slash) {
     // $regex_excluding_initial_slash = "^(controller1|controller2)";
     return $regex_excluding_initial_slash;
 }, 10, 1);
+
 /**
 * Set the path to the CakePHP directory, excluding trailing slash.  
 *     
@@ -150,6 +152,7 @@ add_filter('cakepress_url_regex', function($regex_excluding_initial_slash) {
 add_filter('cakepress_cakephp_path', function($path) {
     return $path;
 }, 10, 1);
+
 /**
 * Set whether access is allowed to the current URL.  For example you may wish to limit access to 
 * certain CakePress URLs, based on the WordPress user role.  By default, any URL not containing 
@@ -169,6 +172,7 @@ add_filter('cakepress_check_acl', function($is_allowed, $url) {
     // }
    return $is_allowed;
 }, 10, 2);
+
 /**
 * Set whether the output should be rendered "clean", i.e., without the WordPress theme header and footer.
 * This would be done for AJAX responses, for example.
@@ -182,6 +186,7 @@ add_filter('cakepress_clean_output', function($is_clean, $url) {
    //    $is_clean = true;
    return $is_clean;
 }, 10, 2);
+
 /**
 * Set whether shortcodes in the Cake body should be executed.
 *
@@ -195,6 +200,7 @@ add_filter('cakepress_execute_shortcodes', function($execute_shortcodes, $url) {
    //    $execute_shortcodes = false;
    return $execute_shortcodes;
 }, 10, 2);
+
 /**
 * Modify the parsed data returned from the CakePHP application for the URL, e.g., the <body> string or 
 * HTTP response code.  
