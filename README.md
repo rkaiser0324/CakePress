@@ -15,7 +15,7 @@ It is known to work with WordPress 4.8.2 and CakePHP 2.9.1.
 
 By default, the CakePHP directory should be named `cakephp` and is typically a sibling to the WordPress one, i.e., if WordPress is at `/path/to/www/Wordpress` then CakePHP is at `/path/to/www/cakephp`.  
 
-Then install the dependencies via `composer install` in the plugin directory.
+Then install the dependencies via `composer install` in the CakePress plugin directory.
 
 ### Bedrock layout
 
@@ -116,6 +116,17 @@ See `cakephp/app/Controller/AppController.php` for sample code showing how user 
 A number of filters are available to control the CakePress behavior.
 
 ```php
+/**
+ * Set the path to rkaiser0324/dom-query/PowerTools/DOM-Query/vendor/Loader.php, if it's not 
+ * located in the usual locations for either of the following:
+ *  1. WordPress-standard layout - in ABSPATH/wp-content/plugins/CakePress/vendor/
+ *  2. Bedrock layout - in /vendor/
+ *      
+ * @param string $path           Path to Loader.php 
+ */
+add_filter('cakepress_dom_query_loader_path', function($path) {
+    return $path;
+}, 10, 1);
 /**
 * Set the URL pattern for CakePress to handle, excluding initial slash.  See add_rewrite_rule() at 
 * https://codex.wordpress.org/Rewrite_API/add_rewrite_rule for examples.  After changing this you 

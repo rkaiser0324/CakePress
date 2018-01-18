@@ -249,6 +249,7 @@ class CakeEmbeddedDispatcher {
             $loader_path = dirname(__FILE__) . '/vendor/rkaiser0324/dom-query/PowerTools/DOM-Query/vendor/Loader.php';
             if (!file_exists($loader_path))
                 $loader_path = ABSPATH . '/../../vendor/rkaiser0324/dom-query/PowerTools/DOM-Query/vendor/Loader.php';
+            $loader_path = apply_filters('cakepress_dom_query_loader_path', $loader_path);
             require $loader_path;
             \Loader::init(array(dirname($loader_path)), false);
 
