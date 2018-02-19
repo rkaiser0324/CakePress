@@ -55,7 +55,7 @@ class CakeEmbeddedDispatcher {
     /**
      * Default content array
      * 
-     * @var array
+     * @var array           
      */
     var $_defaultContentArray = array(
         'http_status_code' => 200,
@@ -66,7 +66,7 @@ class CakeEmbeddedDispatcher {
             'stylesheets' => array(),
             'custom' => array()
         ),
-        'body' => ''
+        'body' => ''    // The innerHTML of the body tag
     );
 
     /**
@@ -261,7 +261,10 @@ class CakeEmbeddedDispatcher {
             // Get the body
             // This avoids mangling HTML by auto-closing <div>s - a big no-no 
             $body = $H->select('body');
-            $contents['body'] = $body->DOM->saveHTML($body->nodes[0]);
+            $body_inner_html = preg_replace('@<body(.*)>(.+)</body>@msiU', '$2', $body->DOM->saveHTML($body->nodes[0]));
+            $contents['body'] = $body_inner_html;
+            if (WP_DEBUG)
+                $contents['body'] = sprintf('<!-- CakePress start -->%s<!-- CakePress end -->', $contents['body']);
         }
         return $contents;
     }
