@@ -144,9 +144,11 @@ add_filter('cakepress_url_regex', function($regex_excluding_initial_slash) {
 }, 10, 1);
 
 /**
-* Set the path to the CakePHP directory, excluding trailing slash.  
+* Set the path to the CakePHP directory containing your application, excluding trailing slash.  This
+* doesn't relate to where the actual CakePHP library is located (e.g., that might be in /vendor/, for
+* example, if you are deploying it via composer).
 *     
-* @param string $path           Default to be a sibling of the WordPress directory, i.e., ABSPATH
+* @param string $path           Default to be a sibling of the WordPress directory (i.e., ABSPATH)
 * @return string
 */
 add_filter('cakepress_cakephp_path', function($path) {
