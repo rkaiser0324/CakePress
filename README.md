@@ -21,14 +21,7 @@ Then install the dependencies via `composer install` in the CakePress plugin dir
 
 If you're using the [Bedrock](https://roots.io/bedrock/) framework, the CakePHP directory should be a sibling to `/web`.  
 
-Use Composer to install the plugin and dependencies. You'll need to add the following repository to your `composer.json`:
-
-```
-        {
-            "url": "https://github.com/rkaiser0324/dom-query",
-            "type": "git"
-        }      
-```
+Use Composer to install the plugin and its one dependency, `rkaiser0324/dom-query`. 
 
 
 ## Server Configuration
@@ -117,10 +110,10 @@ A number of filters are available to control the CakePress behavior.
 
 ```php
 /**
- * Set the path to rkaiser0324/dom-query/PowerTools/DOM-Query/vendor/Loader.php, if it's not 
+ * Set the path to rkaiser0324/dom-query/vendor/Loader.php, if it's not 
  * located in the usual locations for either of the following:
- *  1. WordPress-standard layout - in ABSPATH/wp-content/plugins/CakePress/vendor/
- *  2. Bedrock layout - in /vendor/
+ *  1. WordPress-standard layout - in ABSPATH/wp-content/plugins/CakePress/vendor/*
+ *  2. Bedrock layout - in /vendor/*
  *      
  * @param string $path           Path to Loader.php 
  */

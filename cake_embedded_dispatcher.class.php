@@ -246,12 +246,12 @@ class CakeEmbeddedDispatcher {
         } else {
             // Load the DOM_Query class, first looking in the usual Composer locations (for either standard and Bedrock layouts).  
             // Sadly the composer autoloader doesn't work here.
-            $loader_path = dirname(__FILE__) . '/vendor/rkaiser0324/dom-query/PowerTools/DOM-Query/vendor/Loader.php';
+            $loader_path = dirname(__FILE__) . '/vendor/rkaiser0324/dom-query/vendor/Loader.php';
             if (!file_exists($loader_path))
-                $loader_path = ABSPATH . '/../../vendor/rkaiser0324/dom-query/PowerTools/DOM-Query/vendor/Loader.php';
+                $loader_path = ABSPATH . '/../../vendor/rkaiser0324/dom-query/vendor/Loader.php';
             $loader_path = apply_filters('cakepress_dom_query_loader_path', $loader_path);
             if (!file_exists($loader_path))
-                throw new exception("Cannot load dom-query/PowerTools/DOM-Query/vendor/Loader.php.  Ensure the cakepress_dom_query_loader_path filter is set properly.");
+                throw new exception("Cannot load rkaiser0324/dom-query/vendor/Loader.php.  Ensure the cakepress_dom_query_loader_path filter is set properly.");
                 
             require $loader_path;
             \Loader::init(array(dirname($loader_path)), false);

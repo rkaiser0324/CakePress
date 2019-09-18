@@ -6,12 +6,6 @@
         "preferred-install": "source"
     },
     "minimum-stability": "dev",
-    "repositories": [
-        {
-            "url": "https://github.com/rkaiser0324/dom-query",
-            "type": "git"
-        }
-    ],
     "require": {
         "composer/installers": "1.*",
         "rkaiser0324/dom-query": "dev-master"
