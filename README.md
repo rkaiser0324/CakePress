@@ -6,22 +6,16 @@ CakePress is a WordPress plugin to integrate a CakePHP web application into Word
 * Apache 2.2 or 2.4 with mod_php and mod_rewrite enabled, optionally with nginx 1.6.2 as a reverse-proxy
 * nginx 1.6.2 with PHP-FPM
 
-It is known to work with WordPress 4.8.2 and CakePHP 2.9.1.
+It is known to work with WordPress 5.2 and CakePHP 2.9.1.
 
 
 ## Installation
 
-### Standard WordPress layout
-
-By default, the CakePHP directory should be named `cakephp` and is typically a sibling to the WordPress one, i.e., if WordPress is at `/path/to/www/Wordpress` then CakePHP is at `/path/to/www/cakephp`.  
-
-Then install the dependencies via `composer install` in the CakePress plugin directory.
-
-### Bedrock layout
+For a standard WordPress layout, by default, the CakePHP directory is named `cakephp` and is a sibling to the WordPress one; i.e., if WordPress is at `/path/to/www/Wordpress` then CakePHP is at `/path/to/www/cakephp`.  
 
 If you're using the [Bedrock](https://roots.io/bedrock/) framework, the CakePHP directory should be a sibling to `/web`.  
 
-Use Composer to install the plugin and its one dependency, `rkaiser0324/dom-query`. 
+The plugin has one dependency, `rkaiser0324/dom-query`.  You can use `composer install` in the CakePress plugin directory to add it, or use the `cakepress_dom_query_loader_path` filter to point to it if it's located elsewhere.
 
 
 ## Server Configuration
@@ -85,13 +79,13 @@ server {
 
 1.  Login into your WordPress dashboard at `http://wordpressserver/wp-admin`
 2.  Create a page at `/cakepress` with the page contents of `[cakepress]`
-3.  Go to Settings->Permalinks and enable permalinks 
+3.  Go to Settings->Permalinks, enable permalinks, and save 
 4.  In your theme `functions.php` set the filters below so the CakePress plugin knows which URLs to handle
 5.  Overwrite the contents of `cakephp/app/webroot/index.php` with the file found in this plugin
 
 ### Third-Party WordPress Plugins
 
-Asset minification presents a problem due to the nonstandard location of Javascript and CSS assets served by the CakePHP app (i.e., the aliased location in the URL doesn't match the typical file path under the WordPress webroot).  If you use a asset minification plugin like [Autoptimize](https://wordpress.org/plugins/autoptimize/) or [BWP Minify](https://github.com/OddOneOut/bwp-minify), you will need to either:
+Asset minification can present a problem due to the nonstandard location of Javascript and CSS assets served by the CakePHP app (i.e., the aliased location in the URL doesn't match the typical file path under the WordPress webroot).  If you use a asset minification plugin like [Autoptimize](https://wordpress.org/plugins/autoptimize/) or [BWP Minify](https://github.com/OddOneOut/bwp-minify), you will need to either:
 * Exclude these assets from minification via the plugin configuration, or
 * Minify these assets separately in the CakePHP app.
 
@@ -213,4 +207,6 @@ add_filter('cakepress_filter_contents_array', function($contents, $url) {
  
 ## Credits
 
-This project was based upon the [Jake project](https://github.com/rkaiser0324/jake) which itself was originally developed in 2007 by [Mariano Iglesias](https://github.com/mariano) and [Max](http://www.gigapromoters.com/blog/). Further credits go to Dr. Tarique Sani for his insightful ideas.  Jake is now maintained by [Rolf Kaiser](http://blog.echothis.com).
+This project was based upon the [Jake project](https://github.com/rkaiser0324/jake) which itself was originally developed in 2007 by [Mariano Iglesias](https://github.com/mariano) and [Max](http://www.gigapromoters.com/blog/). Further credits go to Dr. Tarique Sani for his insightful ideas.  
+
+Both Jake and this project are now maintained by [Rolf Kaiser](https://blog.echothis.com).
