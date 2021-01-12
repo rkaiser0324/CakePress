@@ -56,6 +56,10 @@ class CakePressPlugin {
                     }
 
                     add_action('parse_request', function($extra_query_vars) {
+                        if (!empty($extra_query_vars->query_vars['page']))
+                        {
+                            unset($extra_query_vars->query_vars['page']);
+                        }
                         $extra_query_vars->query_vars['pagename'] = 'cakepress';
                         return $extra_query_vars;
                     }, 99);
