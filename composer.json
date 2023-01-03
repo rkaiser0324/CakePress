@@ -3,7 +3,10 @@
     "type": "wordpress-plugin",
     "description": "Allows WordPress to host a CakePHP web application",
     "config": {
-        "preferred-install": "source"
+        "preferred-install": "source",
+        "allow-plugins": {
+            "composer/installers": true
+        }
     },
     "minimum-stability": "dev",
     "require": {
