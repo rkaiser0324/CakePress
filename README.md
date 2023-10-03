@@ -1,33 +1,27 @@
-CakePress
-=========
+# CakePress
 
 CakePress is a WordPress plugin to integrate a CakePHP web application into Wordpress, either single-site or multisite.  It was originally based on the [Jake project](https://github.com/rkaiser0324/jake), which was a similar integration into Joomla.  It has been tested under the following architectures:
 
 * Apache 2.2 or 2.4 with mod_php and mod_rewrite enabled, optionally with nginx 1.6.2 as a reverse-proxy
 * nginx 1.6.2 with PHP-FPM
 
-It is known to work with WordPress 5.2 and CakePHP 2.9.1.
+It has been tested with WordPress 5.2+ and CakePHP 3.10.  If you want to use CakePHP 2.x for some reason, use the "cakephp2" branch.
 
 
 ## Installation
 
-For a standard WordPress layout, by default, the CakePHP directory is named `cakephp` and is a sibling to the WordPress one; i.e., if WordPress is at `/path/to/www/Wordpress` then CakePHP is at `/path/to/www/cakephp`.  
+For a standard WordPress layout, by default, the CakePHP directory is named `cakephp` and is a sibling to the WordPress one; i.e., if WordPress is at `/path/to/www/Wordpress` then CakePHP is at `/path/to/www/cakephp`. Your app should be located at `/path/to/www/cakephp/app`. 
 
-If you're using the [Bedrock](https://roots.io/bedrock/) framework, the CakePHP directory should be a sibling to `/web`.  
+If you're using the [Bedrock](https://roots.io/bedrock/) WordPress framework, the CakePHP directory should be a sibling to `/web`.  
 
-The plugin has one dependency, `rkaiser0324/dom-query`.  You can use `composer install` in the CakePress plugin directory to add it, or use the `cakepress_dom_query_loader_path` filter to point to it if it's located elsewhere.
-
-
-## Server Configuration
-
-The following assumes the WordPress installation lives at `http://wordpressserver`:
+The following assumes the WordPress installation lives at `http://wordpress.example.com`:
 
 ### Apache with mod_php
 
 Add the following directives to the WordPress VirtualHost:
 
-```
-ServerName	wordpressserver
+```apache
+ServerName	wordpress.example.com
 DocumentRoot	/path/to/www/WordPress
 # List the standard asset folders used by CakePHP.  
 # Would need modification if your app uses other paths as well.
@@ -40,7 +34,7 @@ RewriteEngine 	on
 
 Add the following to your nginx configuration, modifying as needed:
 
-```
+```nginx
 # Upstream to abstract backend connection(s) for php
 upstream php {
         #server unix:/var/run/php5-fpm.sock;
@@ -50,7 +44,7 @@ server {
         listen   80; 
         root /path/to/www/Wordpress;
         index index.php index.html index.htm;
-        server_name wordpressserver;        
+        server_name wordpress.example.com;        
         # List the standard asset folders used by Cake.  
         # Would need modification if your app uses other paths as well.
         location ~ ^/(js|css|img)/ {
@@ -75,28 +69,30 @@ server {
 ```
 
 
-## WordPress and CakePHP Configuration
+### WordPress and CakePHP Configuration
 
-1.  Login into your WordPress dashboard at `http://wordpressserver/wp-admin`
+1. Install the CakePress plugin into WordPress.
+1. The plugin has one dependency, `rkaiser0324/dom-query`.  You can use `composer install` in the CakePress plugin directory to add it, or use the `cakepress_dom_query_loader_path` filter to point to it if it's located elsewhere.
+1.  Login into your WordPress dashboard at `http://wordpress.example.com/wp-admin`
 2.  Create a page at `/cakepress` with the page contents of `[cakepress]`
 3.  Go to Settings->Permalinks, enable permalinks, and save 
 4.  In your theme `functions.php` set the filters below so the CakePress plugin knows which URLs to handle
-5.  Overwrite the contents of `cakephp/app/webroot/index.php` with the file found in this plugin
+5.  Replace the files in `/var/www/cakephp/app/*` with the files the [cakephp](cakephp) directory of the plugin.
 
-### Third-Party WordPress Plugins
+### Conflicts with Other Plugins
 
 Asset minification can present a problem due to the nonstandard location of Javascript and CSS assets served by the CakePHP app (i.e., the aliased location in the URL doesn't match the typical file path under the WordPress webroot).  If you use a asset minification plugin like [Autoptimize](https://wordpress.org/plugins/autoptimize/) or [BWP Minify](https://github.com/OddOneOut/bwp-minify), you will need to either:
 * Exclude these assets from minification via the plugin configuration, or
 * Minify these assets separately in the CakePHP app.
 
-If you use a WordPress page caching plugin like [WP Super Cache](https://wordpress.org/plugins/wp-super-cache/) or the now-defunct [Quick Cache](https://github.com/joeldbirch/Quick-Cache) then you probably want to exclude CakePress URLs from being cached, due to problems with redirection.  See `cakephp/app/Controller/AppController.php` for more details.  For this reason, we recommend you use server proxy caching instead of plugin-based page caching, as it doesn't have this limitation.
+If you use a WordPress page caching plugin like [WP Super Cache](https://wordpress.org/plugins/wp-super-cache/) or the now-defunct [Quick Cache](https://github.com/joeldbirch/Quick-Cache) then you probably want to exclude CakePress URLs from being cached, due to problems with redirection.  See [AppController.php](cakephp/app/src/Controller/AppController.php) for more details.  For this reason, we recommend you use server proxy caching instead of plugin-based page caching, as it doesn't have this limitation.
 
 
 ## Usage
 
 ### CakePHP
 
-See `cakephp/app/Controller/AppController.php` for sample code showing how user authentication from WordPress to CakePHP can be handled, as well as integration with page-caching plugins like Quick Cache, if you are using those.
+See [AppController.php](cakephp/app/src/Controller/AppController.php) for sample code showing how user authentication from WordPress to CakePHP can be handled, as well as integration with page-caching plugins like Quick Cache, if you are using those.
 
 ### WordPress
 
