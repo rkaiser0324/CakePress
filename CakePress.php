@@ -21,7 +21,6 @@ class CakePressPlugin {
     }
 
     function onInit() {
-
         $regex_without_leading_slash = apply_filters('cakepress_url_regex', '');
 
         if (!empty($regex_without_leading_slash)) {
@@ -46,14 +45,6 @@ class CakePressPlugin {
                     $cakeDispatcher->setRestoreSession(true);
 
                     $this->_contents = apply_filters('cakepress_filter_contents_array', $cakeDispatcher->get($this->_url), $this->_url);
-
-                    // Set the HTTP status code, such as for soft 404s that were handled by the Cake response
-                    if ($this->_contents['http_status_code'] != 200) {
-                        $http_status_code = $this->_contents['http_status_code'];
-                        add_action('get_header', function() use ($http_status_code) {
-                            status_header($http_status_code);
-                        }, 99);
-                    }
 
                     // Strip any other parsed query_vars so that the request will be processed by the plugin
                     add_action('parse_request', function($query) {

@@ -58,7 +58,6 @@ class CakeEmbeddedDispatcher {
      * @var array           
      */
     var $_defaultContentArray = array(
-        'http_status_code' => 200,
         'head' => array(
             'meta' => array(),
             'title' => '',
@@ -238,10 +237,27 @@ class CakeEmbeddedDispatcher {
     private function _finish($html) {
         global $cakepress_response_stats;
         
+        $crs = $cakepress_response_stats;
+
+        // Set the HTTP status code, such as for soft 404s that were handled by the Cake response
+        if ($crs['status_code'] != 200) {
+            add_action('get_header', function() use ($crs) {
+                status_header($crs['status_code']);
+            }, 99);
+        }
+
+        add_filter( 'wp_headers', function ($headers) use ($crs) {
+            foreach ($crs['headers'] as $name => $arr)
+            {
+                foreach ($arr as $v)
+                {
+                    $headers[$name] = $v;
+                }
+            }
+            return $headers;
+        }, 99);
+
         $contents = $this->_defaultContentArray;
-
-        $contents['http_status_code'] = $cakepress_response_stats['status_code'];
-
         if ($this->cleanOutput) {
             $contents['body'] = $html;
         } else {
