@@ -236,10 +236,11 @@ class CakeEmbeddedDispatcher {
      * @return array $contents	Array formatted as _defaultContentArray, with modified links and references
      */
     private function _finish($html) {
+        global $cakepress_response_stats;
+        
         $contents = $this->_defaultContentArray;
 
-        if (preg_match('@\[cakepress_http_status code="(.+)"\]@msiU', $html, $matches))
-            $contents['http_status_code'] = $matches[1];
+        $contents['http_status_code'] = $cakepress_response_stats['status_code'];
 
         if ($this->cleanOutput) {
             $contents['body'] = $html;
@@ -264,7 +265,7 @@ class CakeEmbeddedDispatcher {
             // Get the body
             // This avoids mangling HTML by auto-closing <div>s - a big no-no 
             $body = $H->select('body');
-            $body_inner_html = preg_replace('@<body(.*)>(.+)</body>@msiU', '$2', $body->DOM->saveHTML($body->nodes[0]));
+            $body_inner_html = empty($body->nodes[0]) ? '' : preg_replace('@<body(.*)>(.+)</body>@msiU', '$2', $body->DOM->saveHTML($body->nodes[0]));
             $contents['body'] = $body_inner_html;
             if (WP_DEBUG)
                 $contents['body'] = sprintf('<!-- CakePress start -->%s<!-- CakePress end -->', $contents['body']);

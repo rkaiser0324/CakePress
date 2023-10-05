@@ -55,13 +55,10 @@ class CakePressPlugin {
                         }, 99);
                     }
 
-                    add_action('parse_request', function($extra_query_vars) {
-                        if (!empty($extra_query_vars->query_vars['page']))
-                        {
-                            unset($extra_query_vars->query_vars['page']);
-                        }
-                        $extra_query_vars->query_vars['pagename'] = 'cakepress';
-                        return $extra_query_vars;
+                    // Strip any other parsed query_vars so that the request will be processed by the plugin
+                    add_action('parse_request', function($query) {
+                        $query->query_vars = ['pagename' => 'cakepress'];
+                        return $query;
                     }, 99);
 
                     // Change the template; see http://stackoverflow.com/questions/8793304/change-template-in-wordpress-plugin 
