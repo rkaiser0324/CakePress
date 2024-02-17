@@ -247,6 +247,13 @@ class CakeEmbeddedDispatcher {
         }
 
         add_filter( 'wp_headers', function ($headers) use ($crs) {
+            // Set the cookies and headers
+
+            foreach($crs['cookies'] as $el)
+            {
+                setcookie($el['name'], $el['value'], $el['expire'], $el['path'], $el['domain'], $el['secure'], $el['httpOnly']);
+            }
+
             foreach ($crs['headers'] as $name => $arr)
             {
                 foreach ($arr as $v)

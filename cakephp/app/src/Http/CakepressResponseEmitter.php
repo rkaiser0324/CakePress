@@ -35,6 +35,14 @@ class CakepressResponseEmitter extends ResponseEmitter
         } else {
             $this->emitBody($response, $maxBufferLength);
         }
+
+        global $cakepress_response_stats;
+        $cakepress_response_stats = [
+            'headers' => $response->getHeaders(),
+            'status_code' => $response->getStatusCode(),
+            'cookies' => $response->getCookies()
+        ];
+
 /*
         if (function_exists('fastcgi_finish_request')) {
             session_write_close();
