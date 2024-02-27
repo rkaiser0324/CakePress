@@ -241,6 +241,15 @@ class CakeEmbeddedDispatcher {
 
         // Set the HTTP status code, such as for soft 404s that were handled by the Cake response
         if ($crs['status_code'] != 200) {
+            // When not in debug mode, display the WordPress 404 page for any 4xx or 5xx status codes
+            if (!(defined('WP_DEBUG') && WP_DEBUG) && preg_match('/^[45]/', $crs['status_code'])) 
+            {             
+                add_filter('parse_query', function($query) {
+                    $query->set('pagename', '');
+                    $query->set_404();
+                }, 1000, 1);
+            }
+
             add_action('get_header', function() use ($crs) {
                 status_header($crs['status_code']);
             }, 99);
