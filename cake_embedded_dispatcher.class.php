@@ -365,7 +365,14 @@ class CakeEmbeddedDispatcher {
                 );
             } else {
                 // Some other tag so add it to the custom array
-                $result['custom'][] = $node->ownerDocument->saveXML($node);
+                $tag = $node->ownerDocument->saveXML($node);
+                $result['custom'][] = $tag;
+
+                // If this is a canonical link, prevent a duplicate by bypassing WordPress's setting
+                if (preg_match('/rel="canonical"/', $tag))
+                {
+                    remove_action( 'wp_head', 'rel_canonical' );
+                }            
             }
         });
 
