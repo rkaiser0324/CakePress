@@ -10,7 +10,7 @@
     },
     "minimum-stability": "dev",
     "require": {
-        "composer/installers": "1.*",
-        "rkaiser0324/dom-query": "dev-master"
+        "composer/installers": "*",
+        "imangazaliev/didom": "2.0.1"
     }
 }

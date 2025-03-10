@@ -72,7 +72,7 @@ server {
 ### WordPress and CakePHP Configuration
 
 1. Install the CakePress plugin into WordPress.
-1. The plugin has one dependency, `rkaiser0324/dom-query`.  You can use `composer install` in the CakePress plugin directory to add it, or use the `cakepress_dom_query_loader_path` filter to point to it if it's located elsewhere.
+1. The plugin has one dependency, `imangazaliev/didom`.  You can use `composer install` in the CakePress plugin directory to add it.
 1.  Login into your WordPress dashboard at `http://wordpress.example.com/wp-admin`
 2.  Create a page at `/cakepress` with the page contents of `[cakepress]`
 3.  Go to Settings->Permalinks, enable permalinks, and save 
@@ -99,18 +99,6 @@ See [AppController.php](cakephp/app/src/Controller/AppController.php) for sample
 A number of filters are available to control the CakePress behavior.
 
 ```php
-/**
- * Set the path to rkaiser0324/dom-query/vendor/Loader.php, if it's not 
- * located in the usual locations for either of the following:
- *  1. WordPress-standard layout - in ABSPATH/wp-content/plugins/CakePress/vendor/*
- *  2. Bedrock layout - in /vendor/*
- *      
- * @param string $path           Path to Loader.php 
- */
-add_filter('cakepress_dom_query_loader_path', function($path) {
-    return $path;
-}, 10, 1);
-
 /**
 * Set the URL pattern for CakePress to handle, excluding initial slash.  See add_rewrite_rule() at 
 * https://codex.wordpress.org/Rewrite_API/add_rewrite_rule for examples.  After changing this you 

@@ -277,28 +277,15 @@ class CakeEmbeddedDispatcher {
         if ($this->cleanOutput) {
             $contents['body'] = $html;
         } else {
-            // Load the DOM_Query class, first looking in the usual Composer locations (for either standard and Bedrock layouts).  
-            // Sadly the composer autoloader doesn't work here.
-            $loader_path = dirname(__FILE__) . '/vendor/rkaiser0324/dom-query/vendor/Loader.php';
-            if (!file_exists($loader_path))
-                $loader_path = ABSPATH . '/../../vendor/rkaiser0324/dom-query/vendor/Loader.php';
-            $loader_path = apply_filters('cakepress_dom_query_loader_path', $loader_path);
-            if (!file_exists($loader_path))
-                throw new exception("Cannot load rkaiser0324/dom-query/vendor/Loader.php.  Ensure the cakepress_dom_query_loader_path filter is set properly.");
-                
-            require $loader_path;
-            \Loader::init(array(dirname($loader_path)), false);
+            require dirname(__FILE__) . '/vendor/autoload.php';
 
-            $H = new \PowerTools\DOM_Query($html);
+            $H = new \DiDom\Document($html);
 
             // Get elements within head
             $contents['head'] = $this->_parseHead($H);
 
             // Get the body
-            // This avoids mangling HTML by auto-closing <div>s - a big no-no 
-            $body = $H->select('body');
-            $body_inner_html = empty($body->nodes[0]) ? '' : preg_replace('@<body(.*)>(.+)</body>@msiU', '$2', $body->DOM->saveHTML($body->nodes[0]));
-            $contents['body'] = $body_inner_html;
+            $contents['body'] = $H->first('html > body')->innerHtml();
             if (WP_DEBUG)
                 $contents['body'] = sprintf('<!-- CakePress start -->%s<!-- CakePress end -->', $contents['body']);
         }
@@ -308,7 +295,7 @@ class CakeEmbeddedDispatcher {
     /**
      * Parse the HEAD portion of contents and get array of elements, sorted by type (meta, title, script, stylesheets, and custom).
      * 
-     * @param \PowerTools\DOM_Query     $H	DOM_Query object
+     * @param \DiDom\Document     $H	Document object
      * 
      * @return array	Associative array of elements by type
      */
@@ -321,52 +308,44 @@ class CakeEmbeddedDispatcher {
             'custom' => array()
         );
 
-        $H->select('head > meta')->each(function($index, $el) use (&$result) {
-            $node = $el->nodes[0];
-            $result['meta'][] = $node->ownerDocument->saveXML($node);
-        });
-
-        $H->select('head > title')->each(function($index, $el) use (&$result) {
-            $node = $el->nodes[0];
-            $result['title'] = $node->textContent;
-        });
-
-        $H->select('head > script')->each(function($index, $el) use (&$result) {
-            $node = $el->nodes[0];
-            if ($node->hasAttribute('src')) {
+        $nodes = $H->find('head > meta');
+        for ($i = 0; $i < count($nodes); $i++) {
+            $result['meta'][] = $nodes[$i]->html();
+        }
+        
+        $result['title'] = $H->first('head > title')->innerHtml();
+        
+        $nodes = $H->find('head > script');
+        for ($i = 0; $i < count($nodes); $i++) {
+            $node = $nodes[$i];
+           if ($node->hasAttribute('src')) {
                 $result['script'][] = array(
-                    'tag' => $node->ownerDocument->saveXML($node),
+                    'tag' => $node->html(),
                     'type' => $node->hasAttribute('type') ? $node->getAttribute('type') : 'text/javascript',
                     'src' => $node->getAttribute('src')
                 );
             } else {
-                // http://stackoverflow.com/questions/6399924/getting-nodes-text-in-php-dom
-                foreach ($node->childNodes as $child) {
-                    if ($child->nodeType == XML_TEXT_NODE) {
-                        $result['script'][] = array(
-                            'tag' => $node->ownerDocument->saveXML($node),
-                            'type' => $node->hasAttribute('type') ? $node->getAttribute('type') : 'text/javascript',
-                            'body' => $child->textContent
-                        );
-                        break;
-                    }
-                }
+                $result['script'][] = array(
+                    'tag' => $node->html(),
+                    'type' => $node->hasAttribute('type') ? $node->getAttribute('type') : 'text/javascript',
+                    'body' => $node->innerHtml()
+                );
             }
-        });
+        }
 
-        $H->select('head > link')->each(function($index, $el) use (&$result) {
-            $node = $el->nodes[0];
+        $nodes = $H->find('head > link');
+        for ($i = 0; $i < count($nodes); $i++) {
+            $node = $nodes[$i];
             if ($node->hasAttribute('rel') && $node->getAttribute('rel') == 'stylesheet' && $node->hasAttribute('href')) {
                 $result['stylesheets'][] = array(
-                    'tag' => $node->ownerDocument->saveXML($node),
+                    'tag' => $node->html(),
                     'rel' => 'stylesheet',
                     'type' => 'text/css',
                     'href' => $node->getAttribute('href')
                 );
             } else {
                 // Some other tag so add it to the custom array
-                $tag = $node->ownerDocument->saveXML($node);
-                $result['custom'][] = $tag;
+                $result['custom'][] = $node->html();
 
                 // If this is a canonical link, prevent a duplicate by bypassing WordPress's setting
                 if (preg_match('/rel="canonical"/', $tag))
@@ -374,20 +353,15 @@ class CakeEmbeddedDispatcher {
                     remove_action( 'wp_head', 'rel_canonical' );
                 }            
             }
-        });
+        }
 
         // Notably, remove() doesn't seem to work, so do it this way instead
-        $H->select('head > *')->each(function($index, $el) use (&$result) {
-            $node = $el->nodes[0];
-            if (!in_array($node->tagName, array('meta', 'title', 'script', 'link')))
-                $result['custom'][] = $node->ownerDocument->saveXML($node);
-        });
-
-        // For some reason the ordering gets reversed in the above, so fix it for the ones that matter
-        $result['script'] = array_reverse($result['script']);
-        $result['stylesheets'] = array_reverse($result['stylesheets']);
-        $result['custom'] = array_reverse($result['custom']);
-
+        $nodes = $H->find('head > *');
+        for ($i = 0; $i < count($nodes); $i++) {
+            $node = $nodes[$i];
+            if (!in_array($node->tagName(), array('meta', 'title', 'script', 'link')))
+                $result['custom'][] = $node->html();
+        }
         return $result;
     }
 

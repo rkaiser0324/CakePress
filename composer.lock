@@ -4,42 +4,40 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "fcf066e3f4f00c42b75e5359dc9c5840",
+    "content-hash": "19fbb13a356ca377472c43516e67e1c9",
     "packages": [
         {
             "name": "composer/installers",
-            "version": "1.x-dev",
+            "version": "dev-main",
             "source": {
                 "type": "git",
                 "url": "https://github.com/composer/installers.git",
-                "reference": "894a0b5c5d34c88b69b097f2aae1439730fa6836"
+                "reference": "5b390889ecbb17bfa69ed5a030fa2e6075a19ba0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/composer/installers/zipball/894a0b5c5d34c88b69b097f2aae1439730fa6836",
-                "reference": "894a0b5c5d34c88b69b097f2aae1439730fa6836",
+                "url": "https://api.github.com/repos/composer/installers/zipball/5b390889ecbb17bfa69ed5a030fa2e6075a19ba0",
+                "reference": "5b390889ecbb17bfa69ed5a030fa2e6075a19ba0",
                 "shasum": ""
             },
             "require": {
-                "composer-plugin-api": "^1.0 || ^2.0"
-            },
-            "replace": {
-                "roundcube/plugin-installer": "*",
-                "shama/baton": "*"
+                "composer-plugin-api": "^1.0 || ^2.0",
+                "php": "^7.2 || ^8.0"
             },
             "require-dev": {
-                "composer/composer": "1.6.* || ^2.0",
-                "composer/semver": "^1 || ^3",
-                "phpstan/phpstan": "^0.12.55",
-                "phpstan/phpstan-phpunit": "^0.12.16",
-                "symfony/phpunit-bridge": "^4.2 || ^5",
-                "symfony/process": "^2.3"
+                "composer/composer": "^1.10.27 || ^2.7.8",
+                "composer/semver": "^1.7.2 || ^3.4.2",
+                "phpstan/phpstan": "^1.11.11",
+                "phpstan/phpstan-phpunit": "^1.4",
+                "phpunit/phpunit": "^8.5.39 || ^9.6.20",
+                "symfony/process": "^5 || ^6 || ^7.1.3"
             },
+            "default-branch": true,
             "type": "composer-plugin",
             "extra": {
                 "class": "Composer\\Installers\\Plugin",
                 "branch-alias": {
-                    "dev-main": "1.x-dev"
+                    "dev-main": "2.x-dev"
                 },
                 "plugin-modifies-install-path": true
             },
@@ -60,9 +58,7 @@
                 }
             ],
             "description": "A multi-framework Composer library installer",
-            "homepage": "https://composer.github.io/installers/",
             "keywords": [
-                "Craft",
                 "Dolibarr",
                 "Eliasis",
                 "Hurad",
@@ -83,7 +79,6 @@
                 "Whmcs",
                 "WolfCMS",
                 "agl",
-                "aimeos",
                 "annotatecms",
                 "attogram",
                 "bitrix",
@@ -92,6 +87,7 @@
                 "cockpit",
                 "codeigniter",
                 "concrete5",
+                "concreteCMS",
                 "croogo",
                 "dokuwiki",
                 "drupal",
@@ -102,7 +98,6 @@
                 "grav",
                 "installer",
                 "itop",
-                "joomla",
                 "known",
                 "kohana",
                 "laravel",
@@ -111,6 +106,7 @@
                 "magento",
                 "majima",
                 "mako",
+                "matomo",
                 "mediawiki",
                 "miaoxing",
                 "modulework",
@@ -130,9 +126,7 @@
                 "silverstripe",
                 "sydes",
                 "sylius",
-                "symfony",
                 "tastyigniter",
-                "typo3",
                 "wordpress",
                 "yawik",
                 "zend",
@@ -140,7 +134,7 @@
             ],
             "support": {
                 "issues": "https://github.com/composer/installers/issues",
-                "source": "https://github.com/composer/installers/tree/1.x"
+                "source": "https://github.com/composer/installers/tree/main"
             },
             "funding": [
                 {
@@ -156,52 +150,65 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2022-03-15T21:23:54+00:00"
+            "time": "2024-11-26T13:24:01+00:00"
         },
         {
-            "name": "rkaiser0324/dom-query",
-            "version": "dev-master",
+            "name": "imangazaliev/didom",
+            "version": "2.0.1",
             "source": {
                 "type": "git",
-                "url": "https://github.com/rkaiser0324/DOM-Query.git",
-                "reference": "8b658e494cefcf572f82e7db209c787b9bc08292"
+                "url": "https://github.com/Imangazaliev/DiDOM.git",
+                "reference": "50fa6595d14f22c0c984efed5c818485cf548136"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/rkaiser0324/DOM-Query/zipball/8b658e494cefcf572f82e7db209c787b9bc08292",
-                "reference": "8b658e494cefcf572f82e7db209c787b9bc08292",
+                "url": "https://api.github.com/repos/Imangazaliev/DiDOM/zipball/50fa6595d14f22c0c984efed5c818485cf548136",
+                "reference": "50fa6595d14f22c0c984efed5c818485cf548136",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.4.0"
+                "ext-dom": "*",
+                "ext-iconv": "*",
+                "php": ">=7.2"
             },
-            "default-branch": true,
+            "require-dev": {
+                "phpunit/phpunit": "^8.5"
+            },
             "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "DiDom\\": "src/DiDom/"
+                }
+            },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
             "authors": [
                 {
-                    "name": "John Slegers",
-                    "email": "slegersjohn@gmail.com",
-                    "role": "Developer"
+                    "name": "Imangazaliev Muhammad",
+                    "email": "imangazalievm@gmail.com"
                 }
             ],
-            "description": "PHP PowerTools DOM-Query Component",
-            "homepage": "https://github.com/PHPPowertools/DOM-Query",
+            "description": "Simple and fast HTML parser",
+            "homepage": "https://github.com/Imangazaliev/DiDOM",
+            "keywords": [
+                "didom",
+                "html",
+                "parser",
+                "xml"
+            ],
             "support": {
-                "source": "https://github.com/rkaiser0324/DOM-Query/tree/master"
+                "issues": "https://github.com/Imangazaliev/DiDOM/issues",
+                "source": "https://github.com/Imangazaliev/DiDOM/tree/2.0.1"
             },
-            "time": "2019-09-18T19:49:11+00:00"
+            "time": "2023-03-05T03:23:48+00:00"
         }
     ],
     "packages-dev": [],
     "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": {
-        "rkaiser0324/dom-query": 20
-    },
+    "stability-flags": [],
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": [],
