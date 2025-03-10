@@ -313,7 +313,7 @@ class CakeEmbeddedDispatcher {
             $result['meta'][] = $nodes[$i]->html();
         }
         
-        $result['title'] = $H->first('head > title')->innerHtml();
+        $result['title'] = $H->first('head > title') ? $H->first('head > title')->innerHtml() : '';
         
         $nodes = $H->find('head > script');
         for ($i = 0; $i < count($nodes); $i++) {
@@ -345,7 +345,8 @@ class CakeEmbeddedDispatcher {
                 );
             } else {
                 // Some other tag so add it to the custom array
-                $result['custom'][] = $node->html();
+                $tag = $node->html();
+                $result['custom'][] = $tag;
 
                 // If this is a canonical link, prevent a duplicate by bypassing WordPress's setting
                 if (preg_match('/rel="canonical"/', $tag))
